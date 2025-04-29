@@ -1,0 +1,1 @@
+import{_ as a,c as i,o as e,ae as t}from"./chunks/framework.eveauE4a.js";const k=JSON.parse('{"title":"Cpp连续读取字符/数组","description":"","frontmatter":{},"headers":[],"relativePath":"C++/连续读取.md","filePath":"C++/连续读取.md"}'),n={name:"C++/连续读取.md"};function p(l,s,h,c,d,r){return e(),i("div",null,s[0]||(s[0]=[t("",5)]))}const E=a(n,[["render",p]]);export{k as __pageData,E as default};

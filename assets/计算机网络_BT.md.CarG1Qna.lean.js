@@ -1,0 +1,1 @@
+import{_ as l,c as e,o as i,ae as r}from"./chunks/framework.eveauE4a.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"计算机网络/BT.md","filePath":"计算机网络/BT.md"}'),o={name:"计算机网络/BT.md"};function a(n,t,p,T,s,u){return i(),e("div",null,t[0]||(t[0]=[r("",11)]))}const c=l(o,[["render",a]]);export{_ as __pageData,c as default};

@@ -1,0 +1,1 @@
+import{_ as i,c as a,o as n,ae as h}from"./chunks/framework.eveauE4a.js";const g=JSON.parse('{"title":"JAVA类数组和方法的重构","description":"","frontmatter":{},"headers":[],"relativePath":"C++/2.md","filePath":"C++/2.md"}'),l={name:"C++/2.md"};function t(p,s,k,e,E,r){return n(),a("div",null,s[0]||(s[0]=[h("",37)]))}const y=i(l,[["render",t]]);export{g as __pageData,y as default};

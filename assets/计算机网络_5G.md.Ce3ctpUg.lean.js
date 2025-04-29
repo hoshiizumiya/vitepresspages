@@ -1,0 +1,1 @@
+import{_ as l,c as e,o as F,ae as i}from"./chunks/framework.eveauE4a.js";const E=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"计算机网络/5G.md","filePath":"计算机网络/5G.md"}'),a={name:"计算机网络/5G.md"};function o(f,R,r,t,s,N){return F(),e("div",null,R[0]||(R[0]=[i("",8)]))}const d=l(a,[["render",o]]);export{E as __pageData,d as default};

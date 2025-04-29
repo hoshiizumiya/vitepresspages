@@ -1,0 +1,1 @@
+import{_ as a,c as i,o as n,ae as s}from"./chunks/framework.eveauE4a.js";const b=JSON.parse('{"title":"C/C++ 指针","description":"","frontmatter":{},"headers":[],"relativePath":"C++/指针.md","filePath":"C++/指针.md"}'),t={name:"C++/指针.md"};function o(c,e,r,p,d,l){return n(),i("div",null,e[0]||(e[0]=[s("",14)]))}const g=a(t,[["render",o]]);export{b as __pageData,g as default};
