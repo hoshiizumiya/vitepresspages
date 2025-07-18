@@ -1,0 +1,1 @@
+import{_ as a,c as r,o as t,ae as n}from"./chunks/framework.eveauE4a.js";const h=JSON.parse('{"title":"Friend Link","description":"","frontmatter":{},"headers":[],"relativePath":"friends.md","filePath":"friends.md"}'),i={name:"friends.md"};function o(l,e,s,d,_,f){return t(),r("div",null,e[0]||(e[0]=[n("",2)]))}const p=a(i,[["render",o]]);export{h as __pageData,p as default};
