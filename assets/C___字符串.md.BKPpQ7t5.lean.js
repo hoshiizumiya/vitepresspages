@@ -1,1 +1,0 @@
-import{_ as i,c as a,o as n,ae as l}from"./chunks/framework.eveauE4a.js";const g=JSON.parse('{"title":"字符串相关操作","description":"","frontmatter":{},"headers":[],"relativePath":"C++/字符串.md","filePath":"C++/字符串.md"}'),t={name:"C++/字符串.md"};function h(p,s,k,e,r,d){return n(),a("div",null,s[0]||(s[0]=[l("",46)]))}const y=i(t,[["render",h]]);export{g as __pageData,y as default};
