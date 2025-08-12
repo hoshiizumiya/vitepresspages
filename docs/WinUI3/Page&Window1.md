@@ -172,6 +172,7 @@
 
 示例：
 ### C++/WinRT 示例
+[MS文档参考](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.window.closed)。找了半天，你应该现在就去给我 star 去。
 ```cpp
 // MainWindow.xaml.cpp
 
