@@ -40,6 +40,7 @@ make<`T`>() 会分配一个实现了 WinRT 接口的对象，并调用其构造�
 - **MoveInZOrderAtTop/Bottom/Below**：调整窗口 Z 顺序。
 
 ## 自定义窗口启动
+我在 Sample 仓库中的 App.xaml.cpp 文件中提供了一个示例，展示了如何在 WinUI 3 中自定义窗口启动。
 有关此框架的所有窗口高级定义都在 Microsoft.UI.Windowing 命名空间中。
 UWP 与 WinUI 3 不一样，特别是命名空间。目前 WinUI 3 使用 `Microsoft.UI.Windowing` 命名空间来处理窗口相关的操作，而不是 `Windows.UI.Xaml.Window`。
 你在查找文档时，千万要注意不要和 UWP 的混淆。你应该是 windows app sdk 中查找相关文档。
@@ -48,59 +49,54 @@ UWP 与 WinUI 3 不一样，特别是命名空间。目前 WinUI 3 使用 `Micro
 // WinUI3\AppWindowSample.cpp
 #include <winrt/Microsoft.UI.Xaml.h>
 #include <winrt/Microsoft.UI.Windowing.h>
-#include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.UI.Interop.h>
 #include <winrt/Windows.Foundation.h>
 
 using namespace winrt;
-using namespace Microsoft::UI::Xaml;
 using namespace Microsoft::UI::Windowing;
 using namespace Windows::Foundation;
 
-IAsyncAction CreateAndShowAppWindowAsync()
+// 基本的创建并显示应用窗口逻辑
+void CreateAndShowAppWindow()
 {
-    // 1. 异步创建 AppWindow 实例
-    auto appWindow = co_await AppWindow::TryCreateAsync();
-    if (!appWindow)
-    {
-        co_return; // 创建失败直接返回
-    }
+	auto appWindow = AppWindow::Create();
+		
+	appWindow.Show();
 
-    // 2. 创建 XAML 内容（如一个简单的 TextBlock）
-    auto textBlock = TextBlock();
-    textBlock.Text(L"Hello, AppWindow!");
-
-    // 3. 设置窗口内容
-    AppWindow::SetAppWindowContent(appWindow, textBlock);
-
-    // 4. 设置窗口最小尺寸
-    Size minSize{400, 300};
-    appWindow.SetPresenter(AppWindowPresenterKind::Overlapped);
-    appWindow.SetPreferredMinSize(minSize);
-
-    // 5. 显示窗口
-    co_await appWindow.TryShowAsync();
-
-    // 6. 关闭事件处理器（可选）
-    appWindow.Closed([](auto const&, auto const&)
-    {
-        // 资源清理逻辑
-    });
+	appWindow.Closing([](auto const&, auto const&) {
+		// 资源清理逻辑
+						});
 }
 
-// 在合适的位置调用（如 App.xaml.cpp 的 OnLaunched 或按钮点击事件中）
-// winrt::CreateAndShowAppWindowAsync();
+// 通过 Win32 获取 HWND 来自定义创建并显示应用窗口
+
+// 通过 IWindowNative 接口获取 HWND
+HWND GetWindowHandle(winrt::Microsoft::UI::Xaml::Window const& window)
+{
+    auto windowNative = window.try_as<::IWindowNative>();
+    if (windowNative)
+    {
+        HWND hwnd = nullptr;
+        windowNative->get_WindowHandle(&hwnd);
+        return hwnd;
+    }
+    return nullptr;
+}
+
+——需要补充！——
+
 ```
-- 使用 co_await AppWindow::TryCreateAsync() 异步创建窗口。
-- 通过 AppWindow::SetAppWindowContent 设置窗口内容（需传入 XAML 元素）。
+- [WINRT Interop参考](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/win32/microsoft.ui.interop/nf-microsoft-ui-interop-getwindowfromwindowid)
+- 通过 AppWindow::SetAppWindowContent 设置窗口内容（需传入 XAML 元素）。——无法设置！需要补充考证！
 - 使用 SetPreferredMinSize 设置窗口最小尺寸。
-- 通过 TryShowAsync() 显示窗口
+- 通过 Show() 显示窗口
 ### 关闭窗口与资源释放
 关闭时的资源释放和清理工作可以通过已在步骤6中注册的事件来完成。我们直接调用这个方法即可出发注册的事件处理器。
 ```cpp
 appWindow.Close();
 ```
 原理说明：  
-AppWindow 的 Closed 事件会在窗口关闭时被触发，无论是用户手动关闭窗口，还是通过代码调用 appWindow.Close()。因此，你在 Closed 事件中注册的资源清理逻辑会被正常执行。
+AppWindow 的 Closing 事件会在窗口关闭时被触发，无论是用户手动关闭窗口，还是通过代码调用 appWindow.Close()。因此，你在 Closing 事件中注册的资源清理逻辑会被正常执行。
 
 
 ## 使用 AppWindowPresenter 来自定义设置窗口呈现方式
@@ -134,7 +130,7 @@ AppWindow myWindow = AppWindow::Create(presenter);
 
 ```C++
 myWindow.Show();
-myWindow.Closed([](auto const&, auto const&) {
+myWindow.Closing([](auto const&, auto const&) {
     // Handle window close
 });
 ```
