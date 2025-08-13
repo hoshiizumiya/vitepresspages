@@ -23,9 +23,9 @@ features:
     link: /gitbook本地部署全指南/gitbook部署简介
   - title: 图形学
     details: 真是神秘的一个方向！
-    link: /计算机图形学/目录
+    link: /计算机图形学/index
   - title: Inside Windwos
-    details: 你真的了解 Windows 吗？
+    details: 你真的了解 Windows 吗？Windows bug 千千万，而我待她如初恋
     link: /Windows/index
   - title: 计算机网络
     details: 啥都有
@@ -33,6 +33,7 @@ features:
   - title: WinUI3(C++/WinRT)
     details: 现代的桌面程序设计框架，以现代的C++语言编写。带你学习 C++/WinRT 原理及实践
     link: /WinUI3/index
+    icon: 🧑‍🔧
   - title: 友站链接❤️
     details: Friends' websits
     link: /friends

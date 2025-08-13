@@ -1,12 +1,12 @@
 ﻿# INDEX 目录
 
-## 补充内容
+## 搬运视频补充内容
 
 - [EP3](EP3.md)
-- [缩放控制](scale.md)
 
-## 原理及实践系列
+## 入门详解——原理及实践系列
 
+- [C++/WinRT 原理及实践 —— WinUI 3 WinRT 命名空间基础](WinUI3-WinRT-namespaceBasement.md)
 - [C++/WinRT 原理及实践 —— TitleBar标题栏自定义](TitleBar.md)
 - [C++/WinRT 原理及实践 —— 模板元编程在 WinRT 中的实现](Template.md)
 - [C++/WinRT 原理及实践 —— WinUI3 页面加载事件解析、以WPF为源、C#/cppwinRT为例](Loaded.md)

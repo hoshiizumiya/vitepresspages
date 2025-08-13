@@ -1,5 +1,5 @@
-- [计算机网络]( index.md)
+﻿- [计算机网络]( index.md)
 	- [5G NR-ARFCN 解析]( 5G.md)
-	- [BT封锁]( BT.md)
+	- [BT识别]( BT.md)
 	- [系统代理]( 系统代理.md)
 	- [tcp/ip协议交换开销]( tcpip协议开销.md)
