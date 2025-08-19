@@ -2,7 +2,6 @@
 
 聚焦 WinRT 标准集合接口/类：语义、与 .NET 映射、典型使用、与 XAML 数据绑定的关系、实现与封装策略。避免一次性过长，仅保留核心 + 可扩展模式。
 
----
 ## 1. 分类速览
 
 | 类别 | 接口 / 类 | 语义 | 是否可变 | 通知 | .NET 投影 | XAML ItemsSource 自动刷新 |
@@ -22,7 +21,7 @@
 ---
 ## 2. 典型接口语义与模式
 
-### 2.1 IIterable<`T`> + IIterator<`T`>
+### 2.1 `IIterable<T>` + `IIterator<T>`
 最小可枚举协议；若你只需要 `for (auto v : obj)` 支持，实现它即可。若要绑定到 XAML ItemsSource 并期望刷新 → 使用 IObservableVector。
 
 ### 2.2 IVector<`T`> vs IObservableVector<`T`>
