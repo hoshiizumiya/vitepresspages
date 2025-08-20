@@ -134,6 +134,61 @@ void App::OnLaunched([[maybe_unused]] LaunchActivatedEventArgs const& e)
 window.AppWindow().TitleBar().PreferredHeightOption(winrt::Microsoft::UI::Windowing::TitleBarHeightOption::Tall);
 ```
 
+### 4.1 SetTitleBar 自定义标题栏区域
+
+WinUI 3 支持通过 `SetTitleBar` 方法将自定义的 XAML 元素（如 Grid、StackPanel 等）指定为窗口的标题栏区域。例如：
+
+```cpp
+window.SetTitleBar(AppTitleBar());
+```
+
+其中 `AppTitleBar()` 返回你自定义的 XAML 元素（如 Grid）。这样可以让你完全自定义标题栏的内容和样式。
+
+#### 注意：自定义区域的行为变化
+
+- 使用 `SetTitleBar` 后，系统默认的拖动、双击最大化等行为会失效。
+- 你需要手动为自定义区域实现拖动和双击最大化等功能。
+
+##### 拖动和双击最大化的实现示例
+
+以 XAML 的 Grid 作为自定义标题栏为例：
+
+```cpp
+// XAML
+<Grid x:Name="AppTitleBar" PointerPressed="AppTitleBar_PointerPressed" DoubleTapped="AppTitleBar_DoubleTapped">
+    <!-- 你的自定义内容 -->
+</Grid>
+```
+
+```cpp
+// C++/WinRT 事件处理
+void MainWindow::AppTitleBar_PointerPressed(IInspectable const&, PointerRoutedEventArgs const& e)
+{
+    // 让窗口可拖动
+    this->TryDragMove();
+}
+
+void MainWindow::AppTitleBar_DoubleTapped(IInspectable const&, DoubleTappedRoutedEventArgs const& e)
+{
+    // 双击最大化/还原
+    if (this->AppWindow().Presenter().State() == winrt::Microsoft::UI::Windowing::AppWindowPresenterState::Maximized)
+    {
+        this->AppWindow().Presenter().Restore();
+    }
+    else
+    {
+        this->AppWindow().Presenter().Maximize();
+    }
+}
+```
+[设置可拖动的矩形参考](https://learn.microsoft.com/zh-cn/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindowtitlebar.setdragrectangles)
+- `TryDragMove()` 让窗口响应拖动。
+- 通过判断 `AppWindow().Presenter().State()` 实现双击最大化/还原。
+
+> 只有你手动处理这些事件后，自定义区域才能像原生标题栏一样拖动和最大化。
+> 可以不设置 SetTitleBar = 系统默认标题栏，省心但不可自定义这些方法行为。
+> 设置 SetTitleBar = 获得自定义UI能力，但需要自己处理所有行为和细节，否则会有副作用和“难用”感。
+
 ### 语法说明
 
 - `make<MainWindow>()`：C++/WinRT 的工厂函数，创建 `MainWindow` 实例。
@@ -141,6 +196,7 @@ window.AppWindow().TitleBar().PreferredHeightOption(winrt::Microsoft::UI::Window
 - `auto appWindow = window.AppWindow();`：获取底层窗口对象。
 - `auto titleBar = appWindow.TitleBar();`：获取标题栏对象。
 - `titleBar.PreferredHeightOption(...)`：设置标题栏高度选项。
+- `window.SetTitleBar(AppTitleBar())`：将自定义 XAML 元素作为标题栏区域。
 
 #### 进阶用法：
 
@@ -261,7 +317,7 @@ Code: 20 位，具体的错误代码
 |E_NOTIMPL	|0x80004001	|方法未实现|
 |CO_E_NOTINITIALIZED	|0x800401F0	COM| 库未初始化|
 
-## 5. 进阶自定义
+## 5. 更多自定义
 
 你还可以通过 `AppWindowTitleBar` 设置更多属性，如背景色、前景色、按钮样式等。例如：
 
@@ -270,6 +326,137 @@ titleBar.ButtonBackgroundColor(winrt::Windows::UI::Colors::Transparent());
 titleBar.ButtonForegroundColor(winrt::Windows::UI::Colors::White());
 ```
 
-## 6. 注意事项
+## 6. 图标自定义
+相关参考
+> [AppWindow.SetTitleBarIcon 方法](https://learn.microsoft.com/zh-cn/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindow.settitlebaricon)
+### 6.1 设置标题栏图标
+namespace = Microsoft.UI.Windowing  
+```cpp
+SetTitleBarIcon(IconId)	
+Sets the icon for the window title bar using the specified icon ID.
+使用指定的图标 ID 设置窗口标题栏的图标。
 
-- 推荐在 XAML 中自定义 UI，并通过 `SetTitleBar` 方法指定自定义区域。你可以前往查看我仓库中的实现。使用 Xaml 提供的 TitleBar 标签元素来自定义
+SetTitleBarIcon(String)	
+Sets the icon for the window title bar using the specified icon path.
+使用指定的图标路径设置窗口标题栏的图标。
+```
+
+这两个方法比较复杂，我们展开来看看
+
+何为IconId？
+隶属语 Microsoft.UI 命名空间
+`IconId` 由结构存储，底层由metadata驱动来定义图标的标识符。表示图标的资源 ID，图片应该在你的项目文件夹下并确保作为内容包含在你的项目资源中一起生成。
+
+必须使用平台调用（P/Invoke）通过 Win32 LoadImage 函数获取图标句柄。然后您可以获得 IconId 并在调用 SetIcon 时使用它。
+DLLImport 用于访问 user32.dll 中的 LoadImage 函数。
+```cs
+using Microsoft.UI;
+using System;
+using System.Runtime.InteropServices;
+
+// ...
+
+protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+{
+    m_window = new MainWindow();
+    LoadIconById("Assets/MyAppIcon.ico");
+    m_window.Activate();
+}
+
+private void LoadIconById(string iconName)
+{
+    nint hwnd = WinRT.Interop.WindowNative.GetWindowHandle(m_window);
+    IntPtr hIcon = LoadImage(
+        IntPtr.Zero, iconName, ImageType.IMAGE_ICON, 16, 16, LoadImageFlags.LR_LOADFROMFILE);
+    IconId iconID = Microsoft.UI.Win32Interop.GetIconIdFromIcon(hIcon);
+
+    // SetIcon
+    m_window?.AppWindow.SetIcon(iconID);
+}
+
+[DllImport("user32.dll", SetLastError = true)]
+public static extern unsafe IntPtr LoadImage(
+    IntPtr hInst,
+    string name,
+    ImageType type,
+    int cx,
+    int cy,
+    LoadImageFlags fuLoad);
+
+public enum ImageType : uint
+{
+    IMAGE_BITMAP = 0,
+    IMAGE_ICON = 1,
+    IMAGE_CURSOR = 2,
+}
+
+[Flags]
+public enum LoadImageFlags : uint
+{
+    LR_CREATEDIBSECTION = 0x00002000,
+    LR_DEFAULTCOLOR = 0x0,
+    LR_DEFAULTSIZE = 0x00000040,
+    LR_LOADFROMFILE = 0x00000010,
+    LR_LOADMAP3DCOLORS = 0x00001000,
+    LR_LOADTRANSPARENT = 0x00000020,
+    LR_MONOCHROME = 0x00000001,
+    LR_SHARED = 0x00008000,
+    LR_VGACOLOR = 0x00000080,
+}
+```
+
+⚠️暂未测试
+```idl
+
+//...
+static void SetAppWindowIcon();
+
+```
+```cpp
+// 1. 包含必要头文件
+#include <windows.h>
+#include <winrt/Microsoft.UI.Windowing.h>
+#include <winrt/Microsoft.UI.Xaml.h>
+
+// 2. 定义 LoadImage 的 C++ 版本
+HICON LoadIconFromFile(const wchar_t* iconPath)
+{
+    // 调用 Win32 API LoadImage 加载图标
+    return static_cast<HICON>(
+        ::LoadImageW(
+            nullptr,                // hInstance
+            iconPath,               // 图标文件路径
+            IMAGE_ICON,             // 类型
+            16, 16,                 // 宽高
+            LR_LOADFROMFILE         // 从文件加载
+        )
+    );
+}
+
+// 3. 获取 HWND 并设置图标
+void SetAppWindowIcon(winrt::Microsoft::UI::Xaml::Window const& window, const wchar_t* iconPath)
+{
+    // 获取 HWND
+    HWND hwnd = 0;
+    window.try_as<IWindowNative>()->get_WindowHandle(&hwnd); // 注意必须使用 window 类型
+    if (!hwnd) return;
+
+    // 加载图标
+    HICON hIcon = LoadIconFromFile(iconPath);
+
+    // 设置窗口图标（小图标/大图标都可）
+    if (hIcon)
+    {
+        ::SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        ::SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    }
+}
+
+// 4. 在 OnLaunched 或窗口初始化时调用
+void App::OnLaunched(winrt::Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
+{
+    window = winrt::make<MainWindow>();
+    SetAppWindowIcon(window, L"Assets\\MyAppIcon.ico");
+    window.Activate();
+}
+```

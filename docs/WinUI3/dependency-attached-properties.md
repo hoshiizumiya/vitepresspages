@@ -28,17 +28,23 @@
 
 IDL：
 ```idl
-runtimeclass MyControl : Microsoft.UI.Xaml.Controls.Control
+// MyControl.idl
+namespace MyApp.UserNamespace
 {
-    MyControl();
-    // 投影包装属性 (可选，若同时想让 x:Bind 访问自然函数包装)
-    String Title; 
-    static Microsoft.UI.Xaml.DependencyProperty TitleProperty{ get; };
+    [default_interface]
+    runtimeclass MyControl : Microsoft.UI.Xaml.Controls.Control
+    {
+        MyControl();
+        // 投影包装属性 (可选，若同时想让 x:Bind 访问自然函数包装)
+        String Title; 
+        static Microsoft.UI.Xaml.DependencyProperty TitleProperty{ get; };
+    }
 }
 ```
-
+头文件略，请复制 Generated Files\sources下 cppwinrt 生成的 UserNamespace.MyControl.h 文件。注意删去静态断言内容。  
 实现：
 ```cpp
+// MyControl.cpp
 struct MyControl : MyControlT<MyControl>
 {
     MyControl() = default;
@@ -52,7 +58,7 @@ struct MyControl : MyControlT<MyControl>
             s_titleProperty = Microsoft::UI::Xaml::DependencyProperty::Register(
                 L"Title",
                 winrt::xaml_typename<hstring>(),
-                winrt::xaml_typename<MyControl>(),
+                winrt::xaml_typename<class_type>(), // 不要使用 ::implementation 命名空间，我们可以简便地写模板实现类里的类型返回方法
                 Microsoft::UI::Xaml::PropertyMetadata{ winrt::box_value(L""), &OnTitleChanged }
             );
         }
@@ -81,8 +87,38 @@ XAML:
 ```xml
 <local:MyControl Title="Hello" />
 ```
+### 细节解释：
 
----
+不要使用 ::implementation 命名空间：
+- 根因：DependencyProperty::Register/RegisterAttached 的 ownerType 必须是“公开的 WinRT 运行时类型”（winmd 里的 runtimeclass）。XAML 与 DP 系统按“(OwnerType, PropertyName)”来定位属性。
+- ::implementation 是 C++/WinRT 的后端实现类，不是 runtimeclass，不在元数据中，XAML 不认识。用它注册会把属性挂到一个“外界不可见”的类型上。
+- 典型后果：
+- XAML/样式 Setter/TemplateBinding/Storyboard 找不到该属性，设置不生效或抛异常（如找不到属性/类型）。
+- 跨语言/跨程序集消费控件失败。
+- C++ 包装器在代码里看似能 SetValue/GetValue，但 XAML 设置依旧无效，因为查找的 OwnerType 不匹配。
+正确写法：
+- 始终传“投影的公开类型”（即 runtimeclass），在控件模板里用 C++/WinRT 生成的 class_type 别名即可。
+- 直接写 `class_type_` ，它在 cppwinrt 自动生成引入的头文件 .g.h 文件中被定义命名空间，确保引入正确的头文件即可。无需关注跳转内容。
+示例（对比）：
+```cpp
+// 错误：ownerType 指向实现命名空间，XAML 不识别
+Microsoft::UI::Xaml::DependencyProperty::Register(
+    L"Title",
+    winrt::xaml_typename<hstring>(),
+    winrt::xaml_typename<MyApp::MyControl::implementation::MyControl>(), // ❌
+    Microsoft::UI::Xaml::PropertyMetadata{ winrt::box_value(L"") }
+);
+```
+```cpp
+// 正确：ownerType 指向公开的 runtimeclass（投影类型）
+Microsoft::UI::Xaml::DependencyProperty::Register(
+    L"Title",
+    winrt::xaml_typename<hstring>(),
+    winrt::xaml_typename<class_type>(), // ✅ C++/WinRT 生成的基层模板，指向 MyApp::MyControl
+    Microsoft::UI::Xaml::PropertyMetadata{ winrt::box_value(L""), &OnTitleChanged }
+);
+```
+
 ## 4. 附加属性 RegisterAttached 模板
 
 IDL 容器（可选）：
@@ -130,7 +166,37 @@ XAML：
 <Button Content="A" local:ViewAttach.FocusGroup="1"/>
 ```
 
+### 附加属性同理：
+- 若要在 XAML 中用 namespace.Property，ownerType 必须是公开 runtimeclass（在 IDL 暴露），不要用 ::implementation。
 ---
+我们可以给任何 DependencyObject 派生类（如 Button、Grid）附加属性。  
+我们也可以为 `Microsoft::UI::Xaml::PropertyMetadata` 参数的初始化内指定回调函数（如 OnFocusGroupChanged）来实现 PropertyChangedCallback Delegate(属性回调委托)，当依赖属性的有效属性值更改时调用回调。  
+我们可以用 C++ 的“统一初始化”（brace-initialization，花括号初始化）在 C++/WinRT 下用来构造临时对象的写法。
+
+`PropertyMetadata{ nullptr, PropertyChangedCallback{ &NodeGraphPanel::OnAppearanceChanged } });`
+
+逐层拆解这句：
+- 目标：给 `DependencyProperty::Register` 的最后一个参数传一个 `PropertyMetadata` 实例。
+- 外层的 `PropertyMetadata{ … }`：
+  - 用花括号对 `PropertyMetadata` 做直接列表初始化，相当于调用它的构造函数。
+  - 第1个实参 `nullptr`：表示该依赖属性的默认值是 null（比如 Brush 没默认值时就传 `nullptr`；若是 `double` 等值类型则常用 `box_value(2.5)` 这类默认值）。
+  - 第2个实参是一个 `PropertyChangedCallback` 对象，用来指定“**属性变更回调**”。
+
+- 内层的 `PropertyChangedCallback{ &NodeGraphPanel::OnAppearanceChanged }`：
+  - 同样是列表初始化，构造一个回调委托对象。
+  - `&NodeGraphPanel::OnAppearanceChanged` 是指向静态成员函数的函数指针。DP 的回调签名要求一个静态/自由函数，形如：
+    `static void OnAppearanceChanged(DependencyObject const&, DependencyPropertyChangedEventArgs const&);`
+  - 运行时当该 DP 发生变化时，就会调用这个回调。你的实现里先 `d.try_as<NodeGraphPanel>()` 拿到实例 self，再做刷新。
+
+等价写法举例（效果一样）：
+- 使用圆括号：`PropertyMetadata(nullptr, PropertyChangedCallback(&NodeGraphPanel::OnAppearanceChanged));`
+- 直接传函数指针（构造能推导时）：`PropertyMetadata(nullptr, &NodeGraphPanel::OnAppearanceChanged);`
+- 用 lambda：`PropertyMetadata(nullptr, PropertyChangedCallback{ [](auto const& d, auto const& e){ /*...*/ } });`
+
+小结
+- 外层花括号：构造 PropertyMetadata（默认值 + 变更回调）。
+- 内层花括号：构造 PropertyChangedCallback（由函数指针或 lambda 构成）。
+- 这是标准的 C++ 列表初始化语法，常见于 C++/WinRT 的依赖属性注册里。
 ## 5. 依赖属性 vs INPC 选择表
 
 | 需求 | 依赖属性 | INPC 普通属性 |
