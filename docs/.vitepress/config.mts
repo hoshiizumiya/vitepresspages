@@ -96,8 +96,32 @@ export default defineConfig({
                         { text: '原理及实践-页面操作其一', link: '/WinUI3/Page&Window1.md' },
                         { text: '原理及实践-页面操作其二', link: '/WinUI3/Page&Window2.md' },
                         { text: '原理及实践-页面初始化', link: '/WinUI3/InitializeComponent.md' },
-                        { text: '原理及实践-数据绑定总览（入口）', link: '/WinUI3/data&ui.md' },
-                        { text: '原理及实践-高级数据绑定与 MVVM 架构实践P1', link: '/WinUI3/winui3-advanced-binding.md' },
+                        {
+                            text: '原理及实践-数据绑定',
+                            items: [
+                                { text: '数据与界面绑定更新（综述入口）', link: '/WinUI3/data&ui.md' },
+                                { text: 'WinRT 集合接口全览', link: '/WinUI3/winrt-collections-overview.md' },
+                                { text: '数据绑定基础模型', link: '/WinUI3/data-binding-basics.md' },
+                                { text: '集合绑定与 IObservableVector', link: '/WinUI3/collection-binding.md' },
+                                { text: '单属性通知与 INotifyPropertyChanged', link: '/WinUI3/property-change-notification.md' },
+                                { text: '依赖属性与附加属性', link: '/WinUI3/dependency-attached-properties.md' },
+                                { text: 'ComboBox 三种绑定模式示例', link: '/WinUI3/combobox-binding-examples.md' },
+                                { text: '绑定调试与常见错误', link: '/WinUI3/binding-debugging-and-pitfalls.md' },
+                                { text: '', link: '/WinUI3/' },
+                            ]
+                        },
+                        {
+                            text: '原理及实践-MVVM & 高级数据绑定深入实践系列',
+                            items: [
+                                { text: '第1篇：基础与核心实现', link: '/WinUI3/winui3-advanced-binding.md' },
+                                { text: '第2篇：高级绑定与结构深化', link: '/WinUI3/winui3-mvvm-part2-advanced-binding.md' },
+                                { text: '第3篇：异步服务注入与测试', link: '/WinUI3/winui3-mvvm-part3-async-services-testing.md' },
+                                { text: '第4篇：性能诊断与架构演进', link: '/WinUI3/winui3-mvvm-part4-performance-diagnostics-architecture.md' },
+                                { text: '', link: '/WinUI3/' },
+                                { text: '', link: '/WinUI3/' },
+                                { text: '', link: '/WinUI3/' },
+                            ]
+                        },
                         { text: '原理及实践-WinRT 接口机制与继承模型详解', link: '/WinUI3/interface.md' },
 
                     ]

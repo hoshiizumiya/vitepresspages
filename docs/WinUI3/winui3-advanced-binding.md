@@ -1,8 +1,19 @@
-﻿# WinUI 3 C++/WinRT 高级数据绑定与 MVVM 架构实践（第一部分）
+﻿# WinUI 3 C++/WinRT 高级数据绑定与 MVVM 架构实践（第 1 篇：核心基石与基础实现）
 
-本文档作为《WinUI 3 C++/WinRT 数据绑定与 UI 更新详解》的高级补充，深入讲解 MVVM 架构实现、高级绑定技巧、性能优化策略和企业级开发最佳实践。本文档分为多个部分，本部分专注于 MVVM 基础架构和 ViewModel 设计模式。
+> 本篇为 **MVVM 深入实践系列** 的第 1 篇（基础与核心基石）。
+> 系列结构：
+> 1. 第1篇（当前）：MVVM 分层职责、基础 BaseViewModel / 命令体系 / 基础绑定落地
+> 2. 第2篇：高级绑定技巧、值转换 / 多源组合 / 动态资源与主题 / 复杂控件绑定
+> 3. 第3篇：异步与任务编排、错误与取消、消息与事件聚合、领域服务注入
+> 4. 第4篇：性能优化、诊断调试、测试策略、可扩展项目结构与部署
+> 5. 附录合辑：IDL 设计模式库 / 代码骨架模板 / 常见陷阱清单
+>
+> 若你是第一次阅读，建议与已有基础文档（data-binding-basics / property-change-notification / dependency-attached-properties / interface 等）交叉对照；本系列不再重复那些文件中的已详述段落，而是给出“已讲解位置”索引与在 MVVM 场景下的整合方式。
 
 ---
+
+本文档作为前部分《WinUI 3 C++/WinRT 数据绑定与 UI 界面更新详解》的高级补充，深入讲解 MVVM 架构实现、高级绑定技巧、性能优化策略和企业级开发最佳实践。本文档分为多个部分，本部分专注于 MVVM 基础架构和 ViewModel 设计模式。
+
 
 ## 一、MVVM 架构全面解析
 
@@ -37,67 +48,57 @@ Model (模型层)
 
 ### 2. WinRT/C++ 中的 MVVM 特殊考虑
 
+> 若不熟悉 WinRT 接口与投影，请先阅读：interface.md；若不熟悉属性通知，请先阅读：property-change-notification.md。
+
 **类型系统要求：**
 ```cpp
-// ViewModel 必须实现的基础接口
+// ViewModel 必须实现的基础接口 (见 property-change-notification.md 已解释事件机制)
 struct BaseViewModel : winrt::implements<BaseViewModel, winrt::INotifyPropertyChanged>
 {
-    // 所有 ViewModel 都需要的基础功能
     winrt::event<winrt::PropertyChangedEventHandler> PropertyChanged;
-    
 protected:
-    // 属性设置辅助方法
     template<typename T>
     bool SetProperty(T& field, T const& value, hstring const& propertyName);
-    
-    // 通知触发方法
     void RaisePropertyChanged(hstring const& propertyName);
 };
 ```
 
-**IDL 文件结构要求：**
+**IDL 文件结构要求（结合“IDL 放置策略”详见本系列第2篇附加段落，会给完整生成脚手架）：**
 ```idl
-// BaseViewModel.idl - 基类声明
+// BaseViewModel.idl - 基类声明（仅需要声明可供绑定的成员；模板/内部帮助函数无需出现在 IDL）
 namespace MyApp.ViewModels
 {
     [default_interface]
     interface IBaseViewModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
-        // 基础 ViewModel 接口
     };
-    
     runtimeclass BaseViewModel : IBaseViewModel
     {
         BaseViewModel();
     };
 }
 
-// MainViewModel.idl - 具体 ViewModel
+// MainViewModel.idl - 具体 ViewModel (展示“属性 + 集合 + 命令方法”形式)
 import "BaseViewModel.idl";
-
 namespace MyApp.ViewModels
 {
     runtimeclass MainViewModel : BaseViewModel
     {
         MainViewModel();
-        
-        // 属性声明
         String Title;
         String UserName;
         Int32 Age;
         Boolean IsEnabled;
-        
-        // 集合属性
         Windows.Foundation.Collections.IObservableVector<String> Items{ get; };
         String SelectedItem;
-        
-        // 命令方法
         void AddItemCommand();
         void RemoveItemCommand();
         void ClearItemsCommand();
     };
 }
 ```
+
+> 已讲解：集合接口细节参见 winrt-collections-overview.md；IObservableVector 实践参见 collection-binding.md。
 
 ---
 
@@ -785,8 +786,22 @@ namespace winrt::MyApp::implementation
 }
 ```
 
-这是第一部分内容，涵盖了 MVVM 架构基础、BaseViewModel 设计、命令模式实现和基本的 View-ViewModel 绑定。接下来的部分将包括：
+## 衔接说明（系列后续篇章导航）
 
-- 第二部分：高级绑定技巧和转换器
-- 第三部分：异步操作和错误处理
-- 第四部分：性能优化和最佳实践
+| 主题 | 下一篇位置 | 本篇铺垫点 |
+|------|------------|------------|
+| 高级绑定与多源/转换 | 第2篇 §2/§3 | SetProperty / 基础命令 |
+| 复杂控件（TreeView / Grid / DataGrid 绑定策略） | 第2篇 §4 | Observable 集合骨架 |
+| 值转换、格式化、合成属性缓存 | 第2篇 §3 | 计算属性示例 |
+| 异步加载 / 取消 / 超时封装 | 第3篇 §1/§2 | RelayCommand 基础 |
+| 域服务注入 / DI 容器 | 第3篇 §4 | ViewModel 构造形式 |
+| 全局消息事件聚合器 | 第3篇 §5 | PropertyChanged 事件模式 |
+| 性能（批量通知 / 虚拟化 / 协程分层） | 第4篇 §1/§2 | SetProperty/集合策略 |
+| 测试（金字塔 / Mock Service / UI smoke） | 第4篇 §4 | 基类解耦 |
+| 部署与结构化目录 | 第4篇 §5 | IDL 拆分策略 |
+
+> 继续阅读：请打开即将新增的 `winui3-mvvm-part2-advanced-binding.md`。
+
+---
+
+（第一篇完）

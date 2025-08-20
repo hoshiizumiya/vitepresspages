@@ -132,7 +132,3 @@ void SamplePage::Title(hstring const& v)
 | IObservableVector | 可观察集合 | 列表自动刷新 |
 | DependencyProperty | 依赖属性 | 样式动画系统 |
 | Attached Property | 附加属性 | 横向扩展 |
-
----
-
-后续深入请进入各专题文件。欢迎在重构或补充阶段提出新章节需求。

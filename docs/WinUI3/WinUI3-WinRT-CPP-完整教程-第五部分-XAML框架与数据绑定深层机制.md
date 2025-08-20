@@ -547,8 +547,21 @@ namespace winrt::WinUI3App1C__::implementation
 
 ### 资源查找机制
 
-XAML 资源系统使用层次化查找：
+XAML 资源系统使用层次化查找：  
 
+实际顺序可概括为（找到即停止）：
+1.	当前元素的 Resources (element.Resources)
+2.	向上遍历视觉树：父元素、再父元素……
+3.	所在 Page / Window / UserControl 的 Resources
+4.	Application.Current.Resources（含 MergedDictionaries）
+5.	主题字典（ThemeDictionaries：根据 Light/Dark/HighContrast 选分支）
+6.	系统内置资源（控件库提供的默认样式、系统颜色）
+7.	找不到：抛异常（StaticResource）或返回 null（TryLookup）
+---
+备注：
+- StaticResource：加载/应用模板时一次性解析，失败直接报错。
+- ThemeResource（WinUI 特有）：不是立即固定，主题切换时重新解析。
+- （WPF 的 DynamicResource 在 WinUI 里没有；文档示例里提“动态”只是概念说明。）
 ```xml
 <!-- App.xaml - 应用程序级资源 -->
 <Application.Resources>
@@ -577,8 +590,13 @@ XAML 资源系统使用层次化查找：
 </Grid>
 ```
 
-#### 资源查找的 C++ 实现
-
+#### 资源查找的 C++ 实现 （非源码，仅伪代码示意）
+核心思想（人话）：
+- 从当前元素开始：如果它的 Resources 字典里有 key，用它。
+- 没有就拿它的 Parent 继续。
+- 顶层还没有就去 Application.Resources。
+- 还没就再去系统/库级资源。
+- 如果都没有：报错或返回空。
 ```cpp
 // 资源查找的内部实现
 class ResourceLookup
@@ -623,68 +641,277 @@ private:
 ```
 
 ### 动态资源和主题切换
+WinUI 3 标准做法:  
+
+WinUI 3 要区分三类“看起来像换主题/换皮肤”的需求场景：
+
+1. 系统 / 深色浅色主题切换（Light / Dark / HighContrast高对比度）  
+2. 应用自定义（与 Light/Dark 组合）  
+3. 运行时根据用户操作即时变色（例如自定义主题、不随系统改变，调色板实时预览）
+
+核心机制只有两种：
+- ThemeResource + RequestedTheme（或系统主题变化） → 重新解析(使用 ThemeResource 定义可随主题变化的资源)
+- 同一资源实例（对象地址不变）属性被修改 → 引用它的控件视觉刷新
+
+WinUI 3 没有 WPF 的 DynamicResource 关键字。StaticResource 在解析后就“定死”引用的对象实例，不会自动换对象！一定要注意；**ThemeResource** 而会在主题触发点重新解析。
+
+---
+
+#### 1. 标准深浅主题切换：ThemeDictionaries + ThemeResource
+
+适用于场景：深色/浅色（可扩展高对比度）主题自动适配。这会根据系统主题变化或用户切换主题时，自动重新解析 ThemeResource。覆盖系统默认的主题设置。
+
+Application 级资源（App.xaml）：  
+你当然也可以在 Page / Window 级别定义 ThemeDictionaries，但通常放在 App 里全局定义。也推荐创建 Style 文件夹后单独编写 XAML 文件管理样式与资源。
+
+```xml
+<Application.Resources>
+  <ResourceDictionary>
+    <ResourceDictionary.ThemeDictionaries>
+      <ResourceDictionary x:Key="Light">
+        <!-- Light 下的基色 -->
+        <Color x:Key="BrandBaseColor">#0062B8</Color>
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="AppForegroundBrush" Color="Black"/>
+        <SolidColorBrush x:Key="BrandBrush"
+                         Color="{StaticResource BrandBaseColor}"/>
+      </ResourceDictionary>
+
+      <ResourceDictionary x:Key="Dark">
+        <!-- Dark 下可重用同名键；ThemeResource 会重新解析 -->
+        <Color x:Key="BrandBaseColor">#3399FF</Color>
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="AppForegroundBrush" Color="#F1F1F1"/>
+        <SolidColorBrush x:Key="BrandBrush"
+                         Color="{StaticResource BrandBaseColor}"/>
+      </ResourceDictionary>
+
+      <ResourceDictionary x:Key="HighContrast">
+        <!-- 高对比度模式下的专用颜色 -->
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="Black"/>
+        <SolidColorBrush x:Key="AppForegroundBrush" Color="Yellow"/>
+        <SolidColorBrush x:Key="BrandBrush" Color="Yellow"/>
+      </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+  </ResourceDictionary>
+</Application.Resources>
+```
+
+页面 / 控件使用 ThemeResource（注意不是 StaticResource）：
+
+```xml
+<Grid Background="{ThemeResource AppBackgroundBrush}">
+  <StackPanel>
+    <TextBlock Foreground="{ThemeResource AppForegroundBrush}"
+               Text="主题示例"/>
+    <Button Background="{ThemeResource BrandBrush}"
+            Content="Action"/>
+  </StackPanel>
+</Grid>
+```
+
+在 C++ 中切换窗口局部主题（不影响系统）：
+Namespace:
+Microsoft.UI.Xaml 
+```cpp
+// MainWindow.xaml.cpp 片段
+void MainWindow::ToggleTheme()
+{
+    using namespace winrt::Microsoft::UI::Xaml;
+    auto root = this->Content().try_as<FrameworkElement>();
+    if (!root) return;
+
+    auto current = root.RequestedTheme();
+    // ElementTheme::Default 表示跟随系统；此处简单在 Light / Dark 间切换
+    ElementTheme next =
+        (current == ElementTheme::Dark) ? ElementTheme::Light : ElementTheme::Dark;
+    root.RequestedTheme(next);
+}
+```
+
+说明：
+- [ElementTheme 文档参考](https://learn.microsoft.com/zh-cn/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.elementtheme)
+- 设置根元素 `FrameworkElement::RequestedTheme` 触发 ThemeResource 重新解析。
+- FrameworkElement.RequestedTheme Property
+  - 获取或设置 UIElement（及其子元素）用于资源确定的 UI 主题。您使用 RequestedTheme 指定的 UI 主题可以覆盖应用程序级别的 RequestedTheme。
+  - ElementTheme::Light 时使用 Light 字典。
+  - ElementTheme::Dark 时使用 Dark 字典。
+  - ElementTheme::HighContrast 时使用 HighContrast 字典。
+  - Remarks  言论
+    - Changing the RequestedTheme value is effectively changing the resource lookup behavior for the element's default template. If you change the value to Light then the template uses the values from the ResourceDictionary that is keyed as "Light" in the ThemeDictionaries collection. Setting the UI theme differently from the app's theme is often appropriate for floating controls such as menus and flyouts.
+    - 更改 RequestedTheme 值实际上是更改元素默认模板的资源查找行为。如果将值更改为 Light ，则模板将使用 ResourceDictionary 中的值，该值在 ThemeDictionaries 集合中键入为“Light”。将 UI 主题设置为与应用程序主题不同，通常适用于菜单和弹出按钮等浮动控件。
+    - You can change the value of the RequestedTheme property for any given element at run-time. That's in contrast to the Application.RequestedTheme property, which throws an exception if you try to set it while the app's running.
+    - 您可以在运行时更改任何给定元素的 RequestedTheme 属性的值。这与应用程序相反。RequestedTheme 属性，如果您在应用程序运行时尝试设置它，则会抛出异常。
+    - The RequestedTheme value you set on a FrameworkElement will inherit to any elements that are nested within the element where RequestedTheme is set, but that inheritance can be overridden by explicitly setting RequestedTheme again. For example, in this XAML example, the parent StackPanel sets the theme to Light, and that value inherits to the first TextBlock child element, but not to the second TextBlock because it's setting the value to Dark instead.
+    - 您在 FrameworkElement 上设置的 RequestedTheme 值将继承到嵌套在设置了 RequestedTheme 的元素中的任何元素，但可以通过再次显式设置 RequestedTheme 来覆盖该继承。例如，在这个 XAML 示例中，父级 StackPanel 将主题设置为 Light ，该值继承给第一个 TextBlock 子元素，但不继承给第二个 TextBlock ，因为它将值设置为 Dark 。
+    ```xml
+    <StackPanel RequestedTheme="Light">
+      <TextBlock>Text using light theme.</TextBlock>
+      <TextBlock RequestedTheme="Dark">Text using dark theme.</TextBlock>
+    </StackPanel>
+    ```
+    - The RequestedTheme property is ignored if the user is running in high contrast mode. See High-contrast themes and XAML high contrast style sample.
+    - 如果用户在高对比度模式下运行，则忽略 RequestedTheme 属性。请参阅高对比度主题和 XAML 高对比度样式示例。
+    - 备注
+      - On Windows, setting RequestedTheme to ElementTheme.Default will always result in "Dark" being the theme.
+      - 在 Windows 上，将 RequestedTheme 设置为 ElementTheme。默认情况下，主题始终为“黑暗”。
+- ElementTheme::Default 时由系统（或 App 级）决定。
+- 不需要手动“刷新”或遍历视觉树。
+
+如果想全局强制主题（所有窗口），可以为每个窗口根节点设置相同 RequestedTheme；WinUI 3 桌面版 Application::RequestedTheme 目前不总是即时影响已创建的窗口，故推荐对根元素逐一设置。
+
+---
+
+#### 2. 自定义“换肤” / 实时调色：保持同一实例修改其属性
+
+适用于：非 Light/Dark 概念，而是用户在 UI 中自选颜色（实时预览）。
+
+初始化：插入一次 Brush 对象（保持实例地址不变）：
 
 ```cpp
-// 实现主题切换
-class ThemeManager
+// App.xaml.cpp OnLaunched 中（或初始化逻辑）
+// 只插入一次；后续修改 Color 即可
+void EnsureThemeRuntimeBrushes()
 {
-private:
-    winrt::Microsoft::UI::Xaml::ResourceDictionary m_lightTheme;
-    winrt::Microsoft::UI::Xaml::ResourceDictionary m_darkTheme;
-    
-public:
-    void InitializeThemes()
+    using namespace winrt;
+    using namespace winrt::Microsoft::UI::Xaml;
+
+    auto app = Application::Current();
+    auto res = app.Resources();
+
+    // 如果已经有，避免重复覆盖
+    if (!res.HasKey(box_value(L"RuntimeAccentBrush")))
     {
-        // 创建浅色主题
-        m_lightTheme = winrt::Microsoft::UI::Xaml::ResourceDictionary{};
-        m_lightTheme.Insert(L"BackgroundBrush", 
-            winrt::Microsoft::UI::Xaml::Media::SolidColorBrush{winrt::Windows::UI::Colors::White()});
-        m_lightTheme.Insert(L"ForegroundBrush", 
-            winrt::Microsoft::UI::Xaml::Media::SolidColorBrush{winrt::Windows::UI::Colors::Black()});
-        
-        // 创建深色主题
-        m_darkTheme = winrt::Microsoft::UI::Xaml::ResourceDictionary{};
-        m_darkTheme.Insert(L"BackgroundBrush", 
-            winrt::Microsoft::UI::Xaml::Media::SolidColorBrush{winrt::Windows::UI::Colors::Black()});
-        m_darkTheme.Insert(L"ForegroundBrush", 
-            winrt::Microsoft::UI::Xaml::Media::SolidColorBrush{winrt::Windows::UI::Colors::White()});
+        res.Insert(L"RuntimeAccentBrush",
+            Microsoft::UI::Xaml::Media::SolidColorBrush{
+                Windows::UI::Colors::CornflowerBlue()
+            });
     }
-    
-    void ApplyTheme(bool isDarkTheme)
-    {
-        auto app = winrt::Microsoft::UI::Xaml::Application::Current();
-        auto mergedDictionaries = app.Resources().MergedDictionaries();
-        
-        // 移除当前主题
-        mergedDictionaries.Clear();
-        
-        // 应用新主题
-        if (isDarkTheme)
-        {
-            mergedDictionaries.Append(m_darkTheme);
-        }
-        else
-        {
-            mergedDictionaries.Append(m_lightTheme);
-        }
-        
-        // 通知所有控件更新
-        InvalidateVisualTree();
-    }
-    
-private:
-    void InvalidateVisualTree()
-    {
-        // 遍历所有窗口和控件，触发重新绘制
-        // 这会导致所有 DynamicResource 引用重新解析
-    }
-};
+}
 ```
+
+XAML 使用 StaticResource（这次允许，因为我们改的是“同一个实例的属性”）：
+
+```xml
+<Button Background="{StaticResource RuntimeAccentBrush}"
+        Content="实时换肤"/>
+```
+
+运行时修改颜色（所有引用立即更新）：
+
+```cpp
+void AccentService::UpdateAccentColor(winrt::Windows::UI::Color const& color)
+{
+    using namespace winrt;
+    using namespace winrt::Microsoft::UI::Xaml;
+
+    auto app = Application::Current();
+    auto res = app.Resources();
+
+    if (auto brushObj = res.Lookup(box_value(L"RuntimeAccentBrush")))
+    {
+        if (auto brush = brushObj.try_as<Microsoft::UI::Xaml::Media::SolidColorBrush>())
+        {
+            brush.Color(color); // 修改实例 -> 所有使用处同步刷新
+        }
+    }
+}
+```
+
+说明：
+- StaticResource 返回的是对象引用；我们不替换字典值，而是修改对象内部状态。
+- 避免“把旧 Brush 替换成新 Brush 实例”——那样控件仍持有旧实例，不会更新。
+
+---
+
+#### 3. 不推荐/常见误区对比
+
+| 做法 | 问题 |
+|------|------|
+| Clear() Application.Resources().MergedDictionaries() 再 Append 新字典 | 误删其他第三方样式；StaticResource 已经拿到旧实例不会刷新 |
+| 用 StaticResource 期望 Light/Dark 自动变 | 不会重新解析；只能 ThemeResource |
+| 频繁创建新的 SolidColorBrush 替换字典 | 控件仍引用旧实例 → 无视觉更新 |
+| 手写“InvalidateVisualTree”遍历强制刷新 | 多余；ThemeResource 或实例属性修改已足够 |
+
+---
+
+#### 4. 组合用法（BrandBrush + Theme）
+
+可在 ThemeDictionaries 中定义一个“占位 Brush”（BrandBrush），再通过运行时修改 BrandBrush.Color 实现“Brand色”与 Light/Dark 兼容：
+
+1. ThemeDictionaries 定义 BrandBrush（分别给 Light / Dark 不同的初始 HSV 基础）
+2. 运行时只修改 BrandBrush.Color（同一实例）
+3. 切主题时 ThemeResource 重新解析可能会替换实例；若你想“保留实例 + 改色”，则不要把 BrandBrush 放 ThemeDictionaries，而是外层 static + 只放衍生色在 ThemeDictionaries
+
+简单示例（Brand Brush 放外层，主题差异只控制背景/前景）：
+
+```xml
+<Application.Resources>
+  <SolidColorBrush x:Key="BrandBrush" Color="#0A84FF"/>
+  <ResourceDictionary>
+    <ResourceDictionary.ThemeDictionaries>
+      <ResourceDictionary x:Key="Light">
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="White"/>
+      </ResourceDictionary>
+      <ResourceDictionary x:Key="Dark">
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#1E1E1E"/>
+      </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+  </ResourceDictionary>
+</Application.Resources>
+```
+
+C++ 改Brand色（不受主题切换替换实例影响）：
+
+```cpp
+void BrandService::SetBrand(winrt::Windows::UI::Color const& c)
+{
+    using namespace winrt;
+    using namespace winrt::Microsoft::UI::Xaml;
+
+    auto res = Application::Current().Resources();
+    if (auto obj = res.Lookup(box_value(L"BrandBrush")))
+    {
+        if (auto brush = obj.try_as<Microsoft::UI::Xaml::Media::SolidColorBrush>())
+            brush.Color(c);
+    }
+}
+```
+
+---
+
+#### 5. 选择策略速览
+
+| 需求 | 建议 |
+|------|------|
+| 标准浅/深色适配 | ThemeDictionaries + ThemeResource + RequestedTheme |
+| 响应系统主题自动变 | 使用 ThemeResource，根元素 RequestedTheme=Default |
+| 自定义运行时色板实时预览 | 固定实例（StaticResource）+ 修改 Brush.Color |
+| 同时支持主题 + Brand色 | 主题差异用 ThemeResource；Brand主色用固定实例 |
+
+---
+
+#### 6. 调试与验证技巧
+
+- 检查是否写成 ThemeResource：在主题切换后，如果颜色不变，首先确认不是 StaticResource。
+- 断点：在 ToggleTheme 后立即查看某个 ThemeResource 的 Brush 实例地址（指针值）是否变化；变化说明重新解析。
+- 性能：避免在高频交互中反复替换 ResourceDictionary；优先改对象属性。
+
+---
+
+#### 7. 小结
+
+1. ThemeResource = 主题点触发重新解析；StaticResource = 一次解析，引用对象实例。  
+2. 没有 DynamicResource 关键字；“动态”依赖两条路径：主题驱动解析或修改对象属性。  
+3. 替换字典集合（Clear + Append）通常不是必要也不安全。  
+4. 运行时个性化配色首选“同一 Brush 实例 + 修改属性”策略。  
+
+这一套模式基本覆盖 WinUI 3 桌面应用主题 / 换肤的主流需求。
 
 ## 模板和样式机制
 
 ### 控件模板的内部工作原理
-
+仅作示例，代码未测试运行！！！
 ```cpp
 // 控件模板的应用过程
 class TemplatedControl : public winrt::Microsoft::UI::Xaml::Controls::Control

@@ -20,7 +20,11 @@
   - [依赖属性与附加属性](dependency-attached-properties.md)
   - [ComboBox 三种绑定模式示例](combobox-binding-examples.md)
   - [绑定调试与常见错误](binding-debugging-and-pitfalls.md)
-- [C++/WinRT 原理及实践 —— WinUI3 高级数据绑定与 MVVM 架构实践（第一部分）](winui3-advanced-binding.md)
+- MVVM & 高级绑定深入系列
+  - [第1篇：基础与核心实现](winui3-advanced-binding.md)
+  - [第2篇：高级绑定与结构深化](winui3-mvvm-part2-advanced-binding.md)
+  - [第3篇：异步服务注入与测试](winui3-mvvm-part3-async-services-testing.md)
+  - [第4篇：性能诊断与架构演进](winui3-mvvm-part4-performance-diagnostics-architecture.md)
 - [C++/WinRT 原理及实践 —— WinUI3 WinRT 接口机制与继承模型详解](interface.md)
 - [C++/WinRT 原理及实践 —— 在 WinUI3 中使用最新的 DirectX 12 入门实战](SwapChainPanel.md)
 

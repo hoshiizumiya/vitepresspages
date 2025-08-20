@@ -1,7 +1,7 @@
-# WinUI 3 WinRT 命名空间基础
+﻿# WinUI 3 WinRT 命名空间基础
 
 Windows app sdk API 较多比较混乱，本文旨在理清相关的 WinRT 命名空间的基础知识，帮助开发者更好地理解 WinUI 3 的 API。
-
+This article thanks to 涟幽Alex.
 ## 继承关系
 
 ### 基本继承链
@@ -9,7 +9,7 @@ Windows app sdk API 较多比较混乱，本文旨在理清相关的 WinRT 命�
 > IUnknown (Win32 COM ABI defined in `unknwn.h`) / Windows.Foundation.IUnkown (WinRT Interface wrapper for Win32) -> IInspectable (Win32 COM ABI defined in `inspectable.h`) / Windows.Foundation.IInspectable (WinRT Interface wrapper for Win32) -> Microsoft.UI.Xaml.DependencyObject -> Microsoft.UI.Xaml.UIElement -> Microsoft.UI.Xaml.FrameworkElement -> ( ... )
 
 ### 描述
-
+#### DependencyObject 依赖对象
 `DependencyObject` 类在其许多派生类上启用依赖属性系统服务，并且是许多重要 UI 相关类（如 [UIElement](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.uielement?view=windows-app-sdk-1.6)、 [Geometry](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.media.geometry?view=windows-app-sdk-1.6)、 [FrameworkTemplate](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.frameworktemplate?view=windows-app-sdk-1.6)、 [Style](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.style?view=windows-app-sdk-1.6) 和 [ResourceDictionary](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.resourcedictionary?view=windows-app-sdk-1.6)）的直接基类。对象通过声明实现此类来参与依赖属性系统，这将允许对象在运行时注册依赖属性到依赖属性系统。
 
 依赖属性系统的主要功能是计算属性值，并提供有关已更改的值的系统通知。参与依赖属性系统的另一个关键类是 `DependencyProperty`。`DependencyProperty` 允许将依赖属性注册到属性系统中，而 DependencyObject 作为基类，实现了 `DependencyObject` 基类的对象可以使用和设置依赖属性。
