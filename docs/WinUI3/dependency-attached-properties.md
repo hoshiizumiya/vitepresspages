@@ -11,9 +11,18 @@
 - 参与模板绑定 TemplateBinding
 - 支持值优先级（本地值覆盖样式等）
 
-这些均由 DependencyProperty 系统提供。
-
----
+这些均由 DependencyProperty 系统提供。  
+微软参考文档：
+- [Dependency properties 依赖属性概述](https://learn.microsoft.com/en-us/windows/uwp/xaml-platform/dependency-properties-overview)
+- [自定义依赖属性](https://learn.microsoft.com/en-us/windows/uwp/xaml-platform/custom-dependency-properties)
+- [附加属性概述](https://learn.microsoft.com/en-us/windows/uwp/xaml-platform/attached-properties-overview)
+- [Custom attached properties 自定义附加属性](https://learn.microsoft.com/en-us/windows/uwp/xaml-platform/custom-attached-properties)
+- 这些文档内容老旧未更新，命名空间等部分过时，不要直接复制使用，注意细节并请结合本篇内容使用。
+- API参考：(⚠️Important!)
+  - [Windows App SDK-DependencyObject Class](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.dependencyobject)
+  - [Windows SDK-DependencyObject Class](https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dependencyobject)
+  - [Windows App SDK-DependencyProperty Class](https://learn.microsoft.com/zh-cn/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.dependencyproperty)
+  - [DependencyProperty.RegisterAttached Method](https://learn.microsoft.com/zh-cn/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.dependencyproperty.registerattached)
 ## 2. 依赖属性核心特征
 
 | 能力 | 说明 |
@@ -99,6 +108,7 @@ XAML:
 正确写法：
 - 始终传“投影的公开类型”（即 runtimeclass），在控件模板里用 C++/WinRT 生成的 class_type 别名即可。
 - 直接写 `class_type_` ，它在 cppwinrt 自动生成引入的头文件 .g.h 文件中被定义命名空间，确保引入正确的头文件即可。无需关注跳转内容。
+- 函数的参数直接写 `winrt::xaml_typename<class_type>()` 即可。在[此处已经简单提到](Page&Window1.md)。
 示例（对比）：
 ```cpp
 // 错误：ownerType 指向实现命名空间，XAML 不识别

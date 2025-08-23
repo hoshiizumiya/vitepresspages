@@ -27,7 +27,7 @@
         - 属于 XAML 的控件方法。函数的名字就是 NavigationView 设置的 x:Name。
         - 发起导航，导航到新页面时调用，旧页面会被销毁。[官方 Frame 参考](https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.frame)
         - 接受一个 winrt 页面类型参数 sourcePageType[模板函数用法官方文档](https://learn.microsoft.com/en-us/uwp/cpp-ref-for-winrt/xaml-typename)。这个命名空间中 Interop （inter operation）代表了在 UWP 代码和 XAML 之间的互操作，目前同样适用于 WinUI3。
-        - 我们使用 winrt::xaml_typename function template (C++/WinRT)辅助函数来获得页面类型。它允许开发者直接使用页面名称对应其模板类型。（注意引入winrt命名空间，页面类型在 winrt::ApplicationName::命名空间下）[内部类型参考](https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.interop.typename?view=winrt-26100)
+        - 我们使用 winrt::xaml_typename function template (C++/WinRT)辅助函数来获得页面类型`winrt::xaml_typename<yourwinrttype>()`。它允许开发者直接使用页面名称对应其模板类型。（注意引入winrt命名空间，页面类型在 winrt::ApplicationName::命名空间下）[返回值 TypeName 内部类型结构参考](https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.interop.typename)/[xaml_typename 函数参考，均为uwp注意可能已过时](https://learn.microsoft.com/en-us/uwp/cpp-ref-for-winrt/xaml-typename)。注意引入头文件`#include <winrt/Windows.UI.Xaml.Interop.h>`，返回一个 Windows::UI::Xaml::Interop::TypeName object representing the type.
         - 在访问您的页面时转换为 TypeName 是必要的，因为它确保导航函数能够正确解释页面的类型。 TypeName 结构包含了类型的 Name 以及其 Kind ，这提供了关于类型来源的上下文信息。这在类型可能是自定义类型或原始类型的情况下尤为重要。通过使用 TypeName ，您确保导航函数接收正确的类型信息以继续进行导航。此实现位于 windows 11 build 中，不开源，故无法查看其具体实现进行分析，欢迎你来对公开资料的补充。
         - 它返回一个 Windows 运行时类型 `Windows::UI::Xaml::Interop::TypeName` 对象来表示该类型。注意，C# 的.NET框架与此不同，请使用 `typeof(YourPageName)`。
         - 用例：
