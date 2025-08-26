@@ -95,6 +95,8 @@ export default defineConfig({
                         { text: '原理及实践-页面加载事件', link: '/WinUI3/Loaded.md' },
                         { text: '原理及实践-页面操作其一', link: '/WinUI3/Page&Window1.md' },
                         { text: '原理及实践-页面操作其二', link: '/WinUI3/Page&Window2.md' },
+                        { text: '原理及实践-现代C++ 中智能指针使用', link: '/WinUI3/Cppwinrt-ptr.md' },
+                        { text: 'C++ / XAML 连接架构', link: '/WinUI3/CPPXAML-framework.md' },
                         { text: '原理及实践-页面初始化', link: '/WinUI3/InitializeComponent.md' },
                         {
                             text: '原理及实践-数据绑定',

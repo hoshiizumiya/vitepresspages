@@ -38,17 +38,33 @@
         - 具体来说 ，可以通过检查 `NavigationFailed` 事件处理的内部状态来判断导航是否成功。
     - `OnNavigatedTo()`
         - 属于页面类的接口方法。
-          - 注意这不是虚方法(Virtual function)，而是一个接口方法(Interface)。不是基类的 virtual 函数。
-          - 通过 HomePageT<`HomePage`> 模板混入的“可替换方法”
-          - 不要加 override，因为它会告诉编译器：“我要重写一个虚函数”，但基类没有这样的 virtual 函数。编译器报错：“不能重写基类成员”。
-          - 在 C++/WinRT 中，这是通过**模板**和代码生成在编译期完成的，不是**运行时虚函数**机制。
-          - WinRT底层使用 CRTP（Curiously Recurring Template Pattern）模式来实现这种接口方法的混入。我们在[模板元章节](https://hoshiizumiya.github.io/vitepresspages/WinUI3/Template.html#%E9%AB%98%E7%BA%A7%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90)中已经简要介绍过相关概念。
+          - 注意这**不是**虚方法(Virtual function)，而是一个接口方法(Interface)。不是基类的 virtual 函数，不依赖 vtable，没有运行时开销。我们在这里说是接口方法其实也不准确，它只是像一个接口一样被使用。
+          - 不要加 `override`，因为它会告诉编译器：“我要重写一个虚函数”，但基类没有这样的 virtual 函数。编译器报错：“不能重写基类成员”。override 只对 虚函数继承体系 有效。
+          - 涉及到 C++/WinRT 框架中一个关键的设计模式：编译期方法注入（通过模板） vs 运行时多态（通过虚函数）。我们来深入解释为什么在 OnNavigatedTo 这种由模板混入（mixin）的方法中，不能使用 override 关键字，即使它看起来像是在“重写”一个基类方法。
+            - OnNavigatedTo 是在 `HomePageT<HomePage>` 模板中通过代码生成或模板特化“注入”到派生类中的。
+            - 在 C++/WinRT 中，这是通过**模板**和代码生成在编译期完成的，不是**运行时虚函数**机制。
+            - WinRT底层使用 **CRTP**（Curiously Recurring Template Pattern）**奇异递归模板模式**来实现这种接口方法的混入。我们在[模板元章节](https://hoshiizumiya.github.io/vitepresspages/WinUI3/Template.html#%E9%AB%98%E7%BA%A7%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90)中已经简要介绍过相关概念。
+            - 因此，OnNavigatedTo 的调用是静态绑定（编译期决定），而不是动态多态。
         - 在目标 cpp 页面中实现接口。在页面被导航到时，框架自动调用。
-        - 函数完整签名：
-            ```cpp
+        - 在 C++/WinRT 中，OnNavigatedTo 属于一类叫做 “事件回调钩子（event hook）” 的方法。这类方法的特点是：
+          - 框架尝试调用它。
+          - 但不要求你必须实现。
+          - 如果你实现了，就执行你的逻辑；否则，跳过。
+          - 这与“接口方法”（如 Java 的 interface）不同，它不是强制契约。
+        - 方法不强制必须使用并实现，OnNavigatedTo 类似的，是一个 “可选的混入钩子（hook）”，它通过 SFINAE 或 ADL + 默认空实现的机制实现“可选调用”。
+        - 如何实现“可选调用”的？—— 编译期探测机制
+          - C++/WinRT 有可能使用 **模板 + SFINAE / if constexpr + ADL**（参数依赖查找） 来实现这种“有条件调用”。这一切都是由 cppwinrt.exe 自动完成的。我暂未研究于 cppwinrt 开源库代码。
+          - 更多相关内容见模板元章节接口实现部分。这里不再涉及。
+
+        - 函数完整签名定义位置：
+          ```cpp
             //.xaml.h 文件中的声明
-            void OnNavigatedTo(winrt::Microsoft::UI::Xaml::Navigation::NavigationEventArgs const& e);
-            ```
+            struct HomePage : HomePageT<HomePage>
+            {
+                HomePage();
+                void OnNavigatedTo(Microsoft::UI::Xaml::Navigation::NavigationEventArgs const& e);
+              };
+          ```
         - 要求函数签名必须一致，返回类型可以不一致，但建议一致。因为 C++ 支持返回类型协变（如指针/引用），但一般要求一致或能自动推导(auto)。
         - 我们能看到其位于 `\Generated Files\winrt\Microsoft.UI.Xaml.Controls.h` 文件中有相关的接口声明：是由 cpp/winrt 自动生成的 **接口调用转发胶水代码**，顾名思义它与 IPageOverridesT<`D`> 配合，完成了从 WinRT 接口到你 C++ 方法实现的完整调用链。
         ```cpp

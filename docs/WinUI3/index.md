@@ -12,6 +12,8 @@
 - [C++/WinRT 原理及实践 —— WinUI3 页面加载事件解析、以WPF为源、C#/cppwinRT为例](Loaded.md)
 - [C++/WinRT 原理及实践 —— WinUI3 的页面操作其一](Page&Window1.md)
 - [C++/WinRT 原理及实践 —— WinUI3 的页面操作其二](Page&Window2.md)
+- [C++/WinRT 原理及实践 —— 现代C++ 中智能指针使用](Cppwinrt-ptr.md)
+  [C++/XAML 连接架构](CPPXAML-framework.md)
 - [C++/WinRT 原理及实践 —— WinUI3 数据与界面绑定更新（综述入口）](data&ui.md)
   - [WinRT 集合接口全览](winrt-collections-overview.md)
   - [数据绑定基础模型](data-binding-basics.md)
