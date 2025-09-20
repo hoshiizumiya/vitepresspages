@@ -45,7 +45,14 @@ export default defineConfig({
                         { text: '指针', link: '/C++/指针' },
                         { text: '连续读取', link: '/C++/连续读取' },
                         { text: 'JAVA类数组和方法的重构', link: '/C++/2' },
-                        { text: 'C++ 11 —— 移动语义', link: '/C++/memory1' }
+                        { text: 'C++ 11 —— 移动语义', link: '/C++/memory1' },
+                        { text: 'const 笔记', link: '/C++/cpp-const-usage' },
+                        { text: '头文件包含', link: '/C++/cpp-headinclude.md' },
+                        { text: '模板继承/多继承', link: '/C++/cpp-inheritance.md' },
+                        { text: '解决方案依赖', link: '/C++/cpp-solutionDependency.md' },
+                        { text: 'Visual Studio类创建', link: '/C++/vs-class-create.md' },
+                        { text: 'VS项目资源文件未加载', link: '/C++/vscpp-resourcefilenotload.md' },
+                        { text: 'CRTP 模式讲解', link: '/C++/zerohajimeideicrtp.md' },
                     ]
                 }
             ],
@@ -119,12 +126,18 @@ export default defineConfig({
                                 { text: '第2篇：高级绑定与结构深化', link: '/WinUI3/winui3-mvvm-part2-advanced-binding.md' },
                                 { text: '第3篇：异步服务注入与测试', link: '/WinUI3/winui3-mvvm-part3-async-services-testing.md' },
                                 { text: '第4篇：性能诊断与架构演进', link: '/WinUI3/winui3-mvvm-part4-performance-diagnostics-architecture.md' },
-                                { text: '', link: '/WinUI3/' },
-                                { text: '', link: '/WinUI3/' },
-                                { text: '', link: '/WinUI3/' },
+                                { text: 'Window 与 AppWindow 自定义', link: '/WinUI3/winrt-appWindow-custom.md' },
+                                { text: 'MVVM 从入门到精通指南', link: '/WinUI3/mvvm-bind-V-Vm.md' },
+                                { text: 'MVVM 模式速查与实例', link: '/WinUI3/mvvm-build.md' },
+                                { text: 'cpp/winrt 命名空间要求', link: '/WinUI3/mvvm-namespace.md' },
+                                { text: 'XAML 附加属性', link: '/WinUI3/Xaml-register.md' },
+                                { text: 'XAML 模板绑定TemplateBinding', link: '/WinUI3/Xaml-TemplateBinding.md' },
+                                { text: '窗口材质', link: '/WinUI3/Xaml-Window-Material.md' },
                             ]
                         },
                         { text: '原理及实践-WinRT 接口机制与继承模型详解', link: '/WinUI3/interface.md' },
+                        { text: '原理及实践-WinRT C++和C#语言实现区别', link: '/WinUI3/winrt-cs-grammer.md' },
+                        { text: '原理及实践-WinRT hstring类型精讲', link: '/WinUI3/winrt-hstring.md' },
 
                     ]
                 },
