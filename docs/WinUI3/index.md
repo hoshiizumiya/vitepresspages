@@ -35,7 +35,7 @@
   - [MVVM 模式速查与实例（IDL/x:Bind、命令、Builder 等）](mvvm-build.md)
   - [WinUI 3 窗口系统-Window 与 AppWindow：标题栏自定义、Presenter、定位与多显示器](winrt-appWindow-custom.md)
   - [MVVM 从入门到精通指南](mvvm-bind-V-VM.md)
-  - [cpp/winrt 命名空间要求](mvvm-namespace.md)
+  - [C++/WinRT 命名空间要求](mvvm-namespace.md)
   - [XAML 附加属性](Xaml-register.md)
   - [XAML 模板绑定TemplateBinding](Xaml-TemplateBinding.md)
   - [窗口材质](Xaml-Window-Material.md)
