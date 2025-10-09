@@ -289,9 +289,9 @@ UI 不更新?
 | 术语 | 英文 | 精简记忆 |
 |------|------|-----------|
 | INPC | INotifyPropertyChanged | 属性广播 |
-| DP | DependencyProperty | 样式动画体系 |
-| AP | Attached Property | 横向扩展标签 |
-| OV | IObservableVector | 列表增量通知 |
+| DP | DependencyProperty | 依赖属性、样式动画体系 |
+| AP | Attached Property | 附加属性、横向扩展标签 |
+| OV | IObservableVector | 可观察向量列表接口、列表增量通知 |
 | IL | Incremental Loading | 滚动加载 |
 | C-Binding | Compiled Binding (x:Bind) | 编译期静态 |
 | R-Binding | Runtime Binding | 反射寻径 |

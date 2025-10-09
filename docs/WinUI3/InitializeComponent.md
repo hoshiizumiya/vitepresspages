@@ -7,7 +7,7 @@
 在 WinUI 3/C++/WinRT 项目中，`InitializeComponent()` 通常只需要在构造函数里调用一次，用于加载 XAML 并初始化控件。
 
 ### InitializeComponent() 函数解析
-
+[C++/WinRT InitializeComponent 官方解释](https://github.com/microsoft/cppwinrt/tree/master/nuget#initializecomponent)
 `InitializeComponent()` 是 WinUI 应用程序中的一个关键函数，用于初始化 XAML 界面组件。这个函数的主要作用包括：
 
 ### 功能概述
@@ -31,18 +31,18 @@ MainWindow::MainWindow()
 }
 ```
 
-这保证了在进行任何其他操作前，UI 组件已经被正确初始化和准备就绪。在这个例子中，只有在调用 `InitializeComponent()` 之后，才能对 `sourceList()` 进行操作。
+这保证了在构造函数中进行任何其他操作前，UI 组件已经被正确初始化和准备就绪。在这个例子中，只有在调用 `InitializeComponent()` 之后，才能对 `sourceList()` 进行操作。
 
 ### 工作原理
 
-`InitializeComponent()` 函数通常是由 WinUI 项目系统自动生成的，不需要手动编写。它在幕后完成以下工作：
+`InitializeComponent()` 函数通常是由**页面构造后**自动调用，不需要手动编写。它在幕后完成以下工作：
 
 - 将 XAML 标记转换为实际的 UI 元素
 - 将这些元素添加到视觉树中
 - 设置在 XAML 中定义的属性
 - 连接事件处理程序
 
-如果不调用此函数，XAML 中定义的 UI 元素将不会被加载，应用程序的界面将为空白。
+
 
 ### 总结
 
@@ -73,8 +73,8 @@ void UserMainPage::Page_Loaded(IInspectable const& sender, RoutedEventArgs const
 
 ### 1. 构造函数里没写 `InitializeComponent()` 页面会隐式初始化吗？
 
-**不会隐式初始化。**  
-在 C++/WinRT（WinUI 3）中，`InitializeComponent()` 必须**手动调用**，通常在页面类的构造函数里。  
+**不会在构造前调用隐式初始化，只会在构造后隐式初始化。**  
+在 C++/WinRT（WinUI 3）中，如果你要在构造里实现部分和页面的内容有关的方法控件、`InitializeComponent()` 必须在页面类的构造函数里**手动调用**。  
 如果你没调用，XAML 里的控件不会被实例化，成员变量（如 `Button`、`Frame` 等）也不会被绑定，访问这些控件会导致空指针异常。
 
 > C# 里会自动生成并调用，但 C++/WinRT 需要你自己写！！
@@ -121,8 +121,7 @@ void UserMainPage::Page_Loaded(IInspectable const& sender, RoutedEventArgs const
 
 
 ## 3.C++/WinRT XAML 控件访问与 InitializeComponent 详解
-
-### 1. C++/WinRT 下 XAML 控件的生成与访问机制
+C++/WinRT 下 XAML 控件的生成与访问机制
 
 - **`InitializeComponent()` 的作用**  
   它负责加载 XAML 文件，实例化界面控件，并把带有 `x:Name` 的控件和 C++ 类的同名方法（通常是自动生成的 getter）关联起来。
@@ -131,23 +130,6 @@ void UserMainPage::Page_Loaded(IInspectable const& sender, RoutedEventArgs const
   如图所示：
 - ![InitializeComponent](https://cdn.jsdelivr.net/gh/hoshiizumiya/images/withoutinitializeComponetresult.png)
 
-
-### 2. 为什么有时“没写 InitializeComponent() 也能访问控件”？
-
-- **可能的原因：**
-  1. **构造函数里其实已经自动生成并调用了 `InitializeComponent()`**  
-     有些模板或代码生成工具会自动加上这行代码。
-  2. **你看到的例子其实并没有真正访问控件属性或方法**  
-     只是声明了 getter，但没有实际用到控件。
-  3. **C# 项目**  
-     C# 项目会自动在构造函数里调用 `InitializeComponent()`，但 C++/WinRT 不会自动加。
-
-
-### 3. 结论
-
-- **C++/WinRT 项目中，必须手动调用 `InitializeComponent()`，否则 XAML 控件不会被实例化。**
-- 你能通过 `x:Name()` 访问控件，是因为 `InitializeComponent()` 已经把它们和 C++ 代码关联起来。
-- 如果没调用，getter 返回的就是空对象，访问会出错。
 
 #### 小贴士
 

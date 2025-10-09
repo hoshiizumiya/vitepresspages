@@ -120,6 +120,15 @@ export default defineConfig({
                             ]
                         },
                         {
+                            text: 'C++/WinRT MVVM Framework',
+                            items: [
+                                { text: '开始使用', link: '/WinUI3/mvvm_framework_getting_started.md' },
+                                { text: 'APIs', link: '/WinUI3/mvvm_framework_api_reference.md' },
+                                { text: '', link: '/WinUI3/' },
+                                { text: '', link: '/WinUI3/' },
+                            ]
+                        },
+                        {
                             text: '原理及实践-MVVM & 高级数据绑定深入实践系列',
                             items: [
                                 { text: '第1篇：基础与核心实现', link: '/WinUI3/winui3-advanced-binding.md' },

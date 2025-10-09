@@ -1,4 +1,4 @@
-我是 GitHub Copilot.
+﻿⚠️文章由GPT5撰写，注意辨别内容真实性。
 这是因为你在使用控件模板（ControlTemplate）时，模板内部的元素（比如 Button、ContentPresenter 等）并不直接拥有你自定义的附加属性（如 `helpers:NavItemIconHelper.UnselectedIcon`）。这些属性通常是定义在控件本身（也就是模板的宿主/父级）上的。
 
 **绑定到父属性的原因：**
