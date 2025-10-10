@@ -159,7 +159,7 @@ RegisterForAutoCleanup(m_reset);
 - AutoExecuteCondition：属性变化后“是否自动执行 Execute”
 
 ### 5.2 异步命令（AsyncDelegateCommand）
-我们希望你在使用异步命令前阅读学习 WinRT 的异步编程模型，推荐资源：
+我们希望你在使用异步命令前阅读学习 WinRT 的异步编程模型，必读文档：
 - [Microsoft Docs - Concurrency and asynchronous operations with C++/WinRT](https://learn.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/concurrency)
 - [Advanced concurrency and asynchrony with C++/WinRT](https://learn.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/concurrency-2)
 

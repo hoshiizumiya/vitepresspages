@@ -122,19 +122,20 @@ m_cmd = ::mvvm::AsyncCommandBuilder<void>(*this)
 ## D. 事件模型（IDL）
 
 IDL 文件：`mvvm_framework_events.idl`/`mvvm_framework_inf.idl`
-
+```
 - CanExecuteRequestedEventArgs(Object Parameter, bool Handled)
 - CanExecuteCompletedEventArgs(Object Parameter, bool Result)
 - ExecuteRequestedEventArgs(Object Parameter)
 - ExecuteCompletedEventArgs(Object Parameter, Int32 hresult)
   - `Succeeded`：`hresult >= 0`
   - `Error`：hresult
-
+```
 校验相关：
+```
 - ValidationRequestedEventArgs(String PropertyName, Object NewValue, bool Handled, bool Cancel)
 - ValidationCompletedEventArgs(String PropertyName, Object NewValue, bool IsValid, IVectorView<String> Errors)
 - ValidationErrorsChangedEventArgs(String PropertyName, IVectorView<String> Errors)
-
+```
 接口：
 - ICommandCleanup：`DetachAllDependencies()`、`ClearAllSubscribers()`、`ResetHandlers()`、`Cancel()`
 - IViewModelCleanup：`FrameworkCleanup()`
