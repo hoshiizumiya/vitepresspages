@@ -1,7 +1,8 @@
 ﻿# WinUI 3 (C++/WinRT) 自定义导航实践指南
 
-> 面向已经了解 WinUI 3 基础控件与 C++/WinRT 语法、希望设计一套可维护、可扩展导航体系的开发者。
+> 面向已经了解 WinUI 3 基础控件与 C++/WinRT 语法、希望设计一套可维护、可扩展导航体系的开发者。  
 > ⚠️目前并非最佳的自定义导航实践，仍有改进空间，欢迎反馈与讨论。
+> 示例代码都可以在我的仓库里找到
 ---
 ## 1. 目标与设计原则
 一个良好的导航层应满足：
@@ -12,7 +13,7 @@
 - 方向同步：Frame 导航后能正确反选对应 `NavigationViewItem`；
 - 与视图模型（ViewModel）解耦：VM 不直接依赖页面类型。
 
-本指南以你当前项目中 `MainWindow` 已采用的“标签驱动 (Tag Routing)”模式为范例进行拆解与扩展。
+本指南以“标签驱动 (Tag Routing)”模式为范例进行拆解与扩展。
 
 ---
 ## 2. 基础结构：NavigationView + Frame
@@ -43,14 +44,14 @@
 
 ---
 ## 3. 标签驱动导航（Tag Routing Pattern）
-用 `NavigationViewItem.Tag` 作为**逻辑路由键**（而不是直接写页面类型判断散落各处）。优点：
+用 `NavigationViewItem.Tag` 作为**逻辑路由键**（而不是直接写页面类型判断散落各处）。  
+优点：
 - 统一抽象：`Navigate(hstring tag)`；
 - 支持动态扩展（运行时添加收藏 / 服务器等项时，只需约定 tag）；
 - 便于持久化最近访问（只存 tag）。
 
 Tag 约定建议：
 - 全小写：`home / contacts / tasks / files / net / servers`；
-- 特殊大小写兼容：示例中允许 "settings" 与系统生成的 "Settings"；
 - 预留前缀：如 `fav_` / `srv_` 代表动态数据项。
 
 ---
@@ -71,7 +72,7 @@ void MainWindow::Navigate(hstring const& tag)
                 return;
             }
             // ... 其它 tag ...
-            if (tag == L"settings" || tag == L"Settings") {
+            if (tag == L"settings") {
                 if (content && content.try_as<Pages::SettingsPage>()) return;
                 self->openSettingsPage();
                 return;
@@ -86,7 +87,6 @@ void MainWindow::Navigate(hstring const& tag)
 - `content.try_as<T>()` 检测是否已在该页面；
 - 避免 `Navigate()` 中直接 `frame.Navigate()` 后又额外更新选中项（委派给 openXPage()）；
 - 使用 `TryEnqueue` 保障在 UI 线程；
-- 统一处理大小写差异（Settings）。
 
 ---
 ## 5. openXPage() 单一职责
@@ -153,7 +153,7 @@ void MainWindow::UpdateNavigationSelection(hstring const& tag)
 
 ---
 ## 9. MVVM 协调
-导航通常是“视图行为”，在多数桌面场景不强制放入 ViewModel。若需要：
+导航通常是“视图行为”，在多数桌面场景不强制放入 ViewModel，在对应的 xaml.cpp 文件进行 code-behind 处理即可。若需要：
 - 定义 `INavigationService` 接口（暴露 `Navigate(tag)`）；
 - 在 VM 中注入（构造函数或属性设置）；
 - VM 触发命令 -> 调用接口；
@@ -244,7 +244,7 @@ void MainWindow::Navigate(hstring const& tag) {
             auto frame = self->NavFrame(); auto content = frame.Content();
             if (tag == L"home") { if (content && content.try_as<Pages::HomePage>()) return; self->openHomePage(); return; }
             if (tag == L"files") { if (content && content.try_as<Pages::FilesPage>()) return; self->openFilesPage(); return; }
-            if (tag == L"settings" || tag == L"Settings") { if (content && content.try_as<Pages::SettingsPage>()) return; self->openSettingsPage(); return; }
+            if (tag == L"settings") { if (content && content.try_as<Pages::SettingsPage>()) return; self->openSettingsPage(); return; }
             if (!(content && content.try_as<Pages::HomePage>())) self->openHomePage();
         }
     });

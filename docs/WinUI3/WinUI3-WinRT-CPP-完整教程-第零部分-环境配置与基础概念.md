@@ -1,5 +1,5 @@
 ﻿# WinUI 3 WinRT C++ 开发完整教程 - 第零部分：环境配置与基础概念
-
+⚠️此系列内容由 AI 强力生成，注意辨别正误！有很多内容还需要**你**来补充！
 ## 什么是 WinUI 3 和 WinRT？
 
 ### WinUI 3 简介
@@ -180,12 +180,12 @@ if (auto strongButton = weakButton.get())
 
 ### 环境
 
-1. **Visual Studio 2022**
+1. **Visual Studio 2026**
    - 版本：使用最新版，社区版即可
    - 必须工作负载：使用 C++ 的桌面开发
 
 2. **Windows SDK**
-   - 版本：Windows 10 SDK (10.0.19041.0) 或更高
+   - 版本：推荐使用最新版的 Windows 10 SDK（26100）
    - 包含：WinRT 头文件和库
 
 ## C++ 基础要求
@@ -194,7 +194,8 @@ if (auto strongButton = weakButton.get())
 
 #### 1. C++17 特性
 
-项目使用 ISO C++17 标准，需要了解基础的，如果你不熟悉，我们在入门系列里也深入讲解了：
+项目默认使用 ISO C++ 17 标准，需要了解基础的，如果你不熟悉，我们在入门系列里也深入讲解了：
+在 VS 2026 里已经默认使用 C++ 20 标准
 
 ```cpp
 // auto 类型推导
@@ -252,7 +253,7 @@ catch (std::exception const& ex)
 ```
 
 ### 推荐的 C++ 学习资源
-
+如果你是仅仅看过黑马/谭浩强等入门内容，开发一个 WinUI 3 桌面应用可能会比较吃力，建议补充以下资源：
 1. **书籍**：
    - 《C++ 20 高级编程》（第5版）
    - 《Effective Modern C++》
@@ -266,11 +267,12 @@ catch (std::exception const& ex)
 
 ### 创建项目
 
-1. 打开 Visual Studio 2022
+1. 打开 Visual Studio 2026
 2. 选择"创建新项目"
 3. 搜索"WinUI"
 4. 选择"空白应用，打包的 (WinUI 3 in C++)"
 5. 设置项目名称：例如 "MyFirstWinUI3App"
+6. 不要勾选项目路径和解决方案同目录将造成混乱不易于管理
 
 ### 项目结构解析
 

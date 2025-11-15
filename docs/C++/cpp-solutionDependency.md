@@ -1,4 +1,4 @@
-# C/C++ 项目“找不到指定动态库 / 无法解析的外部符号”实战指南（Visual Studio）
+﻿# C/C++ 项目“找不到指定动态库 / 无法解析的外部符号”实战指南（Visual Studio）
 
 ## 1. 一句话总览
 - include 目录：只影响“编译阶段”，让编译器找到头文件。
@@ -84,7 +84,7 @@ powershell -Command "Copy-Item -Force $(ProjectDir)thirdparty\openssl\bin\*.dll 
 - 依赖项：必须逐个在“附加依赖项”列出 .lib
 - 版本：.lib 与 .dll 来自同一版本与同一编译器
 
-## 8. CMake 与 vcpkg（可选）
+## 8. CMake 与 vcpkg（可选的项目包管理工具）
 CMake 最小示例
 ```cmake
 # 假设手动提供 OpenSSL
@@ -100,12 +100,13 @@ add_custom_command(TARGET app POST_BUILD
 )
 ```
 
-vcpkg 示例
+vcpkg 示例：  
+// 可以直接在 vs 的控制台里 cd 进项目的路径里进行项目级集成
 ```
-vcpkg install openssl:x64-windows
+vcpkg install openssl
 # CMake toolchain 集成后，直接 target_link_libraries(app PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 ```
-
+vcpkg 会自动处理包含目录、库目录和依赖项以及正常普通的 debug/release 模式。但是还需要你自己添加附加包含目录给 VS 用于代码分析。
 ## 9. 记忆版总结
 - 头文件放“包含目录”，库路径放“库目录”，要连谁放“附加依赖项”，dll 放“输出目录或 PATH”。
 - 报 LNK2019 看“附加依赖项”，报 LNK1104 看“库目录”，运行时报找不到 dll 就“复制到 $(TargetDir) 或加 PATH”。

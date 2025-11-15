@@ -47,7 +47,7 @@
 
 ## 开发教程系列
 
-**此系列以 WinUI3SampleC++ 示例项目为基础，介绍 WinUI3 的开发实践。**
+**此系列以 WinUI3SampleC++ 示例项目为基础，介绍 WinUI3 的开发实践。**⚠️大部分内容采用了 **AI 生成**，请一定注意辨别！  
 相关代码位于 github 仓库地址：[https://github.com/hoshiizumiya/WinUI3CppWinRTSample](https://github.com/hoshiizumiya/WinUI3CppWinRTSample)
 
 - [WinUI3-WinRT-CPP-完整教程-第零部分-环境配置与基础概念](WinUI3-WinRT-CPP-完整教程-第零部分-环境配置与基础概念.md)

@@ -4,7 +4,7 @@
    <MicaBackdrop />
 </Window.SystemBackdrop>
 ```
-这段代码是 WinUI 3 中用于设置窗口背景效果的 XAML 代码。详细解释：
+> 这段代码是 WinUI 3 中用于设置窗口背景效果的 XAML 代码
 
 ## `<Window.SystemBackdrop>` 是什么？
 
