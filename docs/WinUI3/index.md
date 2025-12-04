@@ -57,3 +57,7 @@
 - [WinUI3-WinRT-CPP-完整教程-第四部分-基础API与类型系统深度解析](WinUI3-WinRT-CPP-完整教程-第四部分-基础API与类型系统深度解析.md)
 - [WinUI3-WinRT-CPP-完整教程-第五部分-XAML框架与数据绑定深层机制](WinUI3-WinRT-CPP-完整教程-第五部分-XAML框架与数据绑定深层机制.md)
 - [WinUI3-WinRT-CPP-完整教程-第六部分-实战技巧与最佳实践](WinUI3-WinRT-CPP-完整教程-第六部分-实战技巧与最佳实践.md)
+
+## 功能开发
+
+- [自启动应用程序（以管理员权限）](startup.md)

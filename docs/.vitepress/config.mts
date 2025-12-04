@@ -163,6 +163,14 @@ export default defineConfig({
                         { text: '系列教程-第六部分-实战技巧与最佳实践', link: '/WinUI3/WinUI3-WinRT-CPP-完整教程-第六部分-实战技巧与最佳实践.md' },
 
                     ]
+                },
+                {
+                    text: '功能开发',
+                    collapsed: false,
+                    items: [
+                        { text: '自启动应用程序', link: '/WinUI3/startup.md' },
+
+                    ]
                 }
             ]
         }
