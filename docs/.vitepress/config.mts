@@ -24,8 +24,29 @@ export default defineConfig({
                 { text: 'About me', link: '/README.md' }
             ],
 
+        locales: {
+            '/en-US': {
+                label: 'English',
+                lang: 'en'
+            },
+            '/zh-cn': {
+                label: '简体中文',
+                lang: 'zh-CN', // 可选，将作为 `lang` 属性添加到 `html` 标签中
+                link: '/fr/guide' // 默认 /fr/ -- 显示在导航栏翻译菜单上，可以是外部的
+            }
+        },
+
         sidebar:
         {
+            '/InMyWorldYourStory/': [
+                {
+                    text: 'In MyWorld Your Story',
+                    collapsed: false,
+                    items: [
+                        { text: '目录', link: '/InMyWorldYourStory/index' }
+                    ]
+                }
+            ],
             '/gitbook本地部署全指南/': [
                 {
                     text: '过时的项目指南',

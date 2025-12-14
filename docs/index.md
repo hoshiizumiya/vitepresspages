@@ -34,6 +34,9 @@ features:
     details: 现代的桌面程序设计框架，以现代的C++语言编写。带你学习 C++/WinRT 原理及实践
     link: /WinUI3/index
     icon: 🧑‍🔧
+  - title: IN MY WORLD YOUR STORY
+    details: 《在我的世界，你的故事。》<br/> 这是
+    link: /InMyWorldYourStory/index
   - title: 友站链接❤️
     details: Friends' websits
     link: /friends
