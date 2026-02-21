@@ -10,14 +10,14 @@ WinUI 3 C++ 项目包含以下关键组件：
 ```
 WinUI3App1C++/
 ├── App.xaml                    # 应用程序定义
-├── App.xaml.h/cpp             # 应用程序实现
+├── App.xaml.h/cpp             # 应用程序实现（程序入口点，在不禁用 Xaml 生成的情况下）
 ├── MainWindow.xaml            # 主窗口界面
 ├── MainWindow.xaml.h/cpp      # 主窗口实现
 ├── MainWindow.idl             # 主窗口接口定义
-├── pch.h                      # 预编译头文件
-├── Generated Files/           # 自动生成的代码
-├── Assets/                    # 资源文件
-└── WinUI3App1C++.vcxproj     # 项目文件
+├── pch.h                      # C++ 项目的预编译头文件
+├── Generated Files/           # cppwinrt.exe 自动生成的代码
+├── Assets/                    # 默认的资源文件夹
+└── WinUI3App1C++.vcxproj     # C++ 的项目定义文件，使用 XML 格式
 ```
 
 ### 项目配置要点
@@ -68,7 +68,7 @@ WinUI3App1C++/
 WinUI 3 提供多种窗口类型：
 
 #### 1. 主窗口 (MainWindow)
-
+idl 文件你看不懂是正常的，因为它是 WinRT 的接口定义语言，给 midl.exe 使用来生成 windows metadata 让 cppwinrt.exe 生成开发者可用的投影。对于同名称的文件，他描述了对应 MainWindow 类的结构和成员：定义了一个运行时类 MainWindow，继承自 Microsoft.UI.Xaml.Window，并声明了一些成员内容用于跨语言操作（主要是给 xamlc/cppwinrt 来投影识别连接 .xaml 代码）。  这里有一篇老文档，你可以参考[Dev blogs](https://devblogs.microsoft.com/cppblog/connecting-c-and-xam)。
 ```cpp
 // MainWindow.idl
 namespace WinUI3App1C__

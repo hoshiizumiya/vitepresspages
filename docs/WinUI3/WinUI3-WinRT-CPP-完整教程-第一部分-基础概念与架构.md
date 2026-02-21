@@ -16,7 +16,7 @@ WinUI 3 是微软最新的原生 Windows 应用程序 UI 框架，它结合了 W
 
 ### 什么是 WinRT？
 
-Windows Runtime (WinRT) 是微软设计的应用程序架构，它提供了：
+Windows Runtime (WinRT) 是微软设计的应用程序架构 API，从 UWP 时代而来，它提供了：
 
 1. **语言无关的组件模型**：基于 COM 但简化了接口
 2. **元数据驱动**：使用 .winmd 文件描述类型信息
@@ -93,7 +93,7 @@ C++/WinRT 使用多层架构：
      ↓
 ABI 层 (Generated ABI code)
      ↓
-WinRT 运行时
+WinRT 运行时（COM）
 ```
 
 ### 代码生成过程
@@ -174,8 +174,7 @@ winrt::Windows::Foundation::Collections::IObservableVector<hstring> MainWindow::
 - 运行时通过反射访问属性
 - 支持双向绑定和变更通知
 
-*绑定的更多内容会在入门中讲解[jump-link]()*
-
+绑定的更多内容[jump-link](data-binding-basics.md)
 ### 事件处理机制
 
 ```cpp
@@ -336,18 +335,3 @@ for (auto&& item : collection()) {
     // 处理每个项目
 }
 ```
-
-## 总结
-
-本部分介绍了 WinUI 3 WinRT C++ 开发的基础概念：
-
-1. **WinRT** 提供了语言无关的组件模型
-2. **C++/WinRT** 通过投影技术提供现代 C++ 接口
-3. **WinUI 3** 在此基础上构建现代化 UI 框架
-4. **项目结构** 清晰分离了接口定义、实现和 UI
-
-下一部分将深入讲解具体的开发实践和高级特性。
-
----
-
-*这是 WinUI 3 WinRT C++ 完整教程的第一部分。接下来的部分将涵盖具体的开发实践、数据绑定、导航、异步编程等主题。*

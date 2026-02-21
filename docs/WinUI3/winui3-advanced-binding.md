@@ -799,9 +799,3 @@ namespace winrt::MyApp::implementation
 | 性能（批量通知 / 虚拟化 / 协程分层） | 第4篇 §1/§2 | SetProperty/集合策略 |
 | 测试（金字塔 / Mock Service / UI smoke） | 第4篇 §4 | 基类解耦 |
 | 部署与结构化目录 | 第4篇 §5 | IDL 拆分策略 |
-
-> 继续阅读：请打开即将新增的 `winui3-mvvm-part2-advanced-binding.md`。
-
----
-
-（第一篇完）

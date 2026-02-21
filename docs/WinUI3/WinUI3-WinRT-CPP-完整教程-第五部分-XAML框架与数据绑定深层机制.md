@@ -1090,20 +1090,3 @@ winrt::Windows::Foundation::IInspectable LocalizationExtension::ProvideValue(
     <Button Content="{local:LocalizationExtension ClickMe}"/>
 </Window>
 ```
-
-## 总结
-
-本部分深入讲解了 XAML 框架的核心机制：
-
-1. **XAML 编译**：理解 XAML 如何转换为 C++ 代码
-2. **依赖属性**：掌握 WinUI 3 属性系统的底层实现
-3. **数据绑定**：了解编译时和运行时绑定的区别和原理
-4. **资源系统**：掌握资源查找和主题切换机制
-5. **模板系统**：理解控件模板的应用和自定义
-6. **标记扩展**：学会创建自定义的 XAML 扩展
-
-这些深层知识帮助我们更好地理解和使用 WinUI 3 框架。
-
----
-
-*这是 WinUI 3 WinRT C++ 完整教程的第五部分。下一部分我们将学习高级控件开发和性能优化技巧。*

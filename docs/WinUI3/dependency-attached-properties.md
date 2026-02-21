@@ -50,7 +50,7 @@ namespace MyApp.UserNamespace
     }
 }
 ```
-头文件略，请复制 Generated Files\sources下 cppwinrt 生成的 UserNamespace.MyControl.h 文件。注意删去静态断言内容。  
+头文件略，请复制 Generated Files\sources下 cppwinrt 生成的 UserNamespace.MyControl.h 文件。**注意删去静态断言内容**（StaticAssert）！。  
 实现：
 ```cpp
 // MyControl.cpp
@@ -255,6 +255,3 @@ OutputDebugStringW((L"Local value? " + (GetValue(s_titleProperty)?L"Y":L"N")).c_
 | 横向标签/布局元信息 | 附加属性 |
 | 需要动画/模板 | 依赖属性 |
 | 只是内部状态且无需样式影响 | 普通字段 + INPC（或都不要） |
-
----
-（完）

@@ -1,8 +1,8 @@
-﻿# WinUI 3 C++/WinRT 高级数据绑定与 MVVM 架构实践（第 2 篇：高级绑定与 ViewModel 结构深化）
+﻿# WinUI 3 C++/WinRT 高级数据绑定与 MVVM 架构实践（Part2：高级绑定与 ViewModel 结构深化）
 
 > 衔接自第1篇：已具备 BaseViewModel / RelayCommand / 基础集合与属性通知。本文聚焦：项目目录规划、IDL 拆分策略、进阶绑定（值转换/多源组合/复杂控件）、附加属性与 DependencyProperty 融合 MVVM、典型实体建模与分层放置决策。
 
-## 1. 目录与分层策略（完整落地）
+## 1. 目录与分层策略（仅作建议）
 
 推荐在解决方案根（示例：`src/`）采用如下结构：
 ```
@@ -288,15 +288,3 @@ winrt::IAsyncAction UsersListViewModel::RefreshCommand()
 | 附加属性实现 | DependencyProperty 流程 | dependency-attached-properties.md |
 | 函数组合绑定 | x:Bind 工作模型 | data-binding-basics.md |
 | 增量加载骨架 | 性能部分 | WinUI3-WinRT-CPP-完整教程-第六部分-实战技巧与最佳实践.md |
-
-## 6. 下一篇预告（第3篇）
-将覆盖：
-- 协程与命令融合（AsyncRelayCommand in C++/WinRT）
-- 错误/取消/超时/重试策略矩阵
-- 消息与事件聚合（弱引用 + 频道分发）
-- 服务注入：手写 ServiceLocator vs. 基于 guid map 的容器
-- 复合 ViewModel（主从结构 / 工作单元模式）
-- 测试：Mock Repository & 协程调度注入
-
----
-（第2篇完）

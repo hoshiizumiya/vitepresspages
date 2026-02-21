@@ -1,6 +1,6 @@
 ﻿# 单属性变更通知与 INotifyPropertyChanged
 
-本篇专注：何时实现 INotifyPropertyChanged，属性实现模板，计算属性策略与常见陷阱。
+何时实现 INotifyPropertyChanged，属性实现模板，计算属性策略与常见陷阱。
 
 ---
 ## 1. 什么时候需要 INotifyPropertyChanged
@@ -114,16 +114,13 @@ PropertyChanged(*this, { name });
 OutputDebugStringW((L"[INPC] " + hstring{name} + L"\n").c_str());
 ```
 
-或在包装函数中统一打点。不要在发布版保留大量 OutputDebugString。
+或在包装函数中统一打点。不要在发布版保留大量 OutputDebugString。就比如加一个 `#ifdef _DEBUG` 的宏来控制是否输出调试信息。
 
 ---
 ## 9. 常见错误
 
 | 现象 | 可能原因 | 排查 |
 |------|----------|------|
-| UI 不刷新 | 未实现接口或未调用事件 | 断点 SetProperty |
+| UI 不刷新 | 未实现接口或未调用事件 | 调试断点 SetProperty |
 | XAML 编译失败 | IDL 与实现签名不匹配 | 检查返回类型/名称大小写 |
 | 属性名拼写漏 | 静默失败 | 使用常量或宏集中管理 |
-
----
-（完）

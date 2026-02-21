@@ -37,7 +37,6 @@
   - [MVVM 从入门到精通指南](mvvm-bind-V-VM.md)
   - [C++/WinRT 命名空间要求](mvvm-namespace.md)
   - [XAML 附加属性](Xaml-register.md)
-  - [XAML 模板绑定TemplateBinding](Xaml-TemplateBinding.md)
   - [窗口材质](Xaml-Window-Material.md)
 
 - [C++/WinRT 原理及实践 —— WinUI3 WinRT 接口机制与继承模型详解](interface.md)

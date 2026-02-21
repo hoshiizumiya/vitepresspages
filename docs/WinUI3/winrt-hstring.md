@@ -1,4 +1,4 @@
-﻿### 1. 每一行最后的 `\` 是什么
+﻿### 1. 对于宏定义来说每一行最后的 `\` 是什么
 
 这是**C/C++ 预处理器的换行符**，用于让宏定义可以写成多行。  
 比如：
@@ -26,15 +26,6 @@ L"abc" // 类型是 const wchar_t*
 - `winrt::hstring` 是 WinRT 的字符串类型，也可以用 `L"abc"` 或 `std::wstring` 构造。
 
 **本宏只是让参数变成宽字符串字面量（`const wchar_t*`），最终会被 `std::wstring_view` 或 `std::wstring` 接收。**
-
----
-
-#### 总结
-
-- `\` 让宏可以多行书写，实际等价于一行。
-- `L` 让字符串变成宽字符串字面量（`const wchar_t*`），最终通常用于 `std::wstring` 或 `std::wstring_view`，也可以间接用于 `hstring`。
-
----
 
 ### 1. 每一行最后的 `\` 是什么？
 
@@ -123,7 +114,7 @@ winrt::hstring s3 = std::wstring(L"abc"); // 构造，OK
 
 ### 3. 宏参数类型
 
-你的宏只是把参数变成 `L"xxx"`，传递给的函数参数类型是 `std::wstring_view`，不是 `hstring`。  
+宏只是把参数变成 `L"xxx"`，传递给的函数参数类型是 `std::wstring_view`，不是 `hstring`。  
 如果你想让它变成 `hstring`，需要这样写：
 
 ```cpp

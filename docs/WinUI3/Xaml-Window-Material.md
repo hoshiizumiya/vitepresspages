@@ -30,9 +30,9 @@
 
 ## 其他可选的背景类型
 
-除了 `MicaBackdrop`，WinUI 3 还支持其他背景类型：
+除了 `MicaBackdrop`，WinUI 3 还支持其他背景类型，你甚至可以通过 Composition Api 进行自定义背景：
 - `AcrylicBackdrop`：亚克力材质（更强的模糊效果）
-- `MicaBackdrop Alt`：替代 Mica 材质（不同的模糊效果）具有更强的模糊效果
+- `MicaBackdrop Alt`（云母增强）：替代 Mica 材质（不同的模糊效果）具有更强的模糊效果
 - `DesktopAcrylicBackdrop`：桌面亚克力材质
 
 如果不设置 `<Window.SystemBackdrop>`，WinUI 3 应用窗口将不会有 Mica、Acrylic 等特殊背景效果，而是使用系统默认的普通窗口背景

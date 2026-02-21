@@ -27,7 +27,7 @@ window.AppWindow().TitleBar().PreferredHeightOption(winrt::Microsoft::UI::Window
 - C++/WinRT 需要显式调用方法（加括号），因为没有 C# 的属性语法糖。
 - 这是 C++ 语言和 C# 语言设计上的差异，属于语法层面的不同。
 
-如需进一步了解 C++/WinRT 的属性和方法映射，可以查阅 [uwp 官方文档以初步了解](https://learn.microsoft.com/zh-cn/windows/uwp/cpp-and-winrt-apis/)。使用api时请查询 windows app sdk 文档，不要与 windows sdk 文档看混。
+进一步了解 C++/WinRT 的属性和方法映射，查阅 [uwp 官方文档以初步了解](https://learn.microsoft.com/windows/uwp/cpp-and-winrt-apis/)。使用api时请查询 windows app sdk 文档，不要与 windows sdk 文档看混。
 
 ## 示例
 
@@ -60,12 +60,3 @@ public AppWindowTitleBar TitleBar
 
 - `TitleBar` 是一个只读属性（没有 `set`），每次访问都会调用 `get_TitleBar` 方法。
 - `=>` 是表达式体成员语法，只能用于简单返回值的场景。
-
-### 5. 总结
-
-- 这行代码定义了一个只读属性 `TitleBar`，每次访问时会通过 `IAppWindowMethods.get_TitleBar` 方法获取标题栏对象。
-- 这种写法简洁，常用于只读属性。
-
----
-
-C++/WinRT 对应的写法，就是每次都要显式调用方法（加括号），而 C# 可以用属性语法简化访问。

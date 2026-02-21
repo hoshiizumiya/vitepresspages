@@ -1,8 +1,12 @@
-# WinUI3 cpp/winRT 将Window与appWindow结合使用创造丰富的自定义界面，带你从零认识窗口设计
-本篇基于 Windows app sdk 因为和 uwp 的 api 有很大区别，windows sdk 在WinUI3 里大量已经不适用
+﻿# WinUI3 cpp/winRT 将Window与appWindow结合使用创造丰富的自定义界面，带你从零认识窗口设计
+
+本篇基于 Windows App SDK 因为和 UWP 的 API 有很大区别，windows SDK 在 WinUI3 里大量已经不适用
+
 ## 引言
 
-首先会带你介绍Window类和AppWindow类的详细概念并指出有什么具体区别
+> 参考:[https://learn.microsoft.com/windows/apps/develop/ui/windowing-overview](https://learn.microsoft.com/windows/apps/develop/ui/windowing-overview)  
+
+首先会带你介绍 Window 类和 AppWindow 类的详细概念并指出有什么具体区别
 
 ## 核心概念：Window vs AppWindow
 
