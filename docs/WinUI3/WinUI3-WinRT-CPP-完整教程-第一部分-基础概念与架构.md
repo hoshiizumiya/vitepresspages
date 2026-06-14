@@ -99,7 +99,7 @@ WinRT 运行时（COM）
 ### 代码生成过程
 
 1. **IDL 编译**：`midl.exe` 将 IDL 文件编译为 `.winmd` 文件
-2. **投影生成**：`cppwinrt.exe` 读取 `.winmd` 生成 C++ 头文件
+2. **投影生成**：`cppwinrt.exe` 读取 `.winmd` 生成 C++ 头文件。你可以观察到 windows app sdk 提供的 winmd 文件被编译成了 winrt 目录下的头文件，提供 winrt.Microsoft.xxx 等类型的定义，路径位于 `Solution\packages\Microsoft.WindowsAppSDK.WinUI.<version>\metadata`，最后在开启模块的状态下构建过程中翻译成 ixx 被复制到 `Generated Files\winrt` 目录下
 3. **实现模板**：生成 `.g.h` 和 `.g.cpp` 文件作为实现基础
 
 ### 类型映射
